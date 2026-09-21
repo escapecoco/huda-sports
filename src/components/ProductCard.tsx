@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { useCart } from "@/lib/cart-context";
@@ -13,6 +14,8 @@ export function ProductCard({
   aspect?: "square" | "portrait";
 }) {
   const { addItem } = useCart();
+  const displaySizes = product.sizes.filter((s) => ["S", "M", "L", "XL"].includes(s));
+  const [selectedSize, setSelectedSize] = useState(displaySizes[1] ?? displaySizes[0]);
 
   function quickAdd(e: React.MouseEvent) {
     e.preventDefault();
@@ -20,7 +23,7 @@ export function ProductCard({
       slug: product.slug,
       name: product.name,
       price: product.price,
-      size: product.sizes[1] ?? product.sizes[0],
+      size: selectedSize,
       color: product.colors[0].name,
       image: product.image,
       focus: product.focus,
@@ -75,16 +78,30 @@ export function ProductCard({
           <p className="text-[11.5px] tracking-[0.12em] uppercase text-[#8C8C8C]">{product.category}</p>
         )}
         <div className="flex gap-1.5 flex-wrap">
-          {product.sizes
-            .filter((s) => ["S", "M", "L", "XL"].includes(s))
-            .map((sz) => (
-              <span
+          {displaySizes.map((sz) => {
+            const active = sz === selectedSize;
+            return (
+              <motion.button
                 key={sz}
-                className="text-[10.5px] font-semibold tracking-[0.08em] text-[#9A9A9A] border border-white/14 px-[7px] py-[3px]"
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setSelectedSize(sz);
+                }}
+                whileTap={{ scale: 0.88 }}
+                transition={{ duration: 0.12 }}
+                aria-pressed={active}
+                aria-label={`Select size ${sz}`}
+                className={`text-[10.5px] font-semibold tracking-[0.08em] px-[7px] py-[3px] border cursor-pointer transition-colors ${
+                  active
+                    ? "border-lime text-lime bg-lime/10"
+                    : "border-white/14 text-[#9A9A9A] hover:border-white/30 hover:text-white"
+                }`}
               >
                 {sz}
-              </span>
-            ))}
+              </motion.button>
+            );
+          })}
         </div>
         <div className="flex items-center justify-between gap-3 mt-auto">
           <p className="font-display font-extrabold text-[16px] text-white">${product.price.toFixed(2)}</p>
