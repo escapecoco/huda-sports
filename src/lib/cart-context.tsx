@@ -20,15 +20,29 @@ export type CartItem = {
   qty: number;
 };
 
+export type CartToast = {
+  id: string;
+  name: string;
+  image: string;
+  focus: string;
+  size: string;
+  color: string;
+  qty: number;
+};
+
 type CartContextValue = {
   items: CartItem[];
   count: number;
   subtotal: number;
+  toasts: CartToast[];
   addItem: (item: Omit<CartItem, "qty">, qty?: number) => void;
   removeItem: (slug: string, size: string, color: string) => void;
   setQty: (slug: string, size: string, color: string, qty: number) => void;
   clear: () => void;
+  dismissToast: (id: string) => void;
 };
+
+const TOAST_DURATION = 2800;
 
 const CartContext = createContext<CartContextValue | null>(null);
 const STORAGE_KEY = "huda-cart";
@@ -40,6 +54,11 @@ function lineKey(slug: string, size: string, color: string) {
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [hydrated, setHydrated] = useState(false);
+  const [toasts, setToasts] = useState<CartToast[]>([]);
+
+  const dismissToast = useCallback((id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  }, []);
 
   useEffect(() => {
     try {
@@ -76,7 +95,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       }
       return [...prev, { ...item, qty }];
     });
-  }, []);
+
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    setToasts((prev) => [
+      ...prev,
+      { id, name: item.name, image: item.image, focus: item.focus, size: item.size, color: item.color, qty },
+    ]);
+    if (typeof window !== "undefined") {
+      window.setTimeout(() => dismissToast(id), TOAST_DURATION);
+    }
+  }, [dismissToast]);
 
   const removeItem = useCallback((slug: string, size: string, color: string) => {
     const key = lineKey(slug, size, color);
@@ -106,8 +134,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   );
 
   const value = useMemo(
-    () => ({ items, count, subtotal, addItem, removeItem, setQty, clear }),
-    [items, count, subtotal, addItem, removeItem, setQty, clear]
+    () => ({ items, count, subtotal, toasts, addItem, removeItem, setQty, clear, dismissToast }),
+    [items, count, subtotal, toasts, addItem, removeItem, setQty, clear, dismissToast]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
