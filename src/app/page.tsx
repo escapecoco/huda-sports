@@ -3,12 +3,26 @@
 import { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "motion/react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { MarkerNote } from "@/components/MarkerNote";
 import { CtaLink } from "@/components/Button";
 import { ProductCard } from "@/components/ProductCard";
+import { Reveal } from "@/components/motion/Reveal";
+import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import { bestSellers } from "@/lib/products";
+
+const EASE = [0.16, 1, 0.3, 1] as const;
+
+const heroContainer = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.09, delayChildren: 0.1 } },
+};
+const heroItem = {
+  hidden: { opacity: 0, y: 18 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: EASE } },
+};
 
 export default function Home() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -35,42 +49,68 @@ export default function Home() {
 
       {/* Hero */}
       <section id="top" className="relative flex flex-wrap items-stretch bg-ground-alt border-b border-hairline/90">
-        <div className="flex-[1_1_380px] z-10 px-7 py-13 pl-12 flex flex-col justify-center gap-4.5 relative overflow-hidden">
+        <motion.div
+          className="flex-[1_1_380px] z-10 px-7 py-13 pl-12 flex flex-col justify-center gap-4.5 relative overflow-hidden"
+          initial="hidden"
+          animate="show"
+          variants={heroContainer}
+        >
           <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(200,243,43,0.06)_0%,rgba(6,6,6,0)_58%)] pointer-events-none" />
-          <p className="m-0 text-xs tracking-[0.42em] uppercase text-[#BFBFBF] relative">Move Belong Be More</p>
-          <h1 className="m-0 font-display italic font-black [font-stretch:82%] text-[clamp(52px,8vw,104px)] leading-[0.86] tracking-[-0.02em] uppercase text-white relative">
+          <motion.p variants={heroItem} className="m-0 text-xs tracking-[0.42em] uppercase text-[#BFBFBF] relative">
+            Move Belong Be More
+          </motion.p>
+          <motion.h1
+            variants={heroItem}
+            className="m-0 font-display italic font-black [font-stretch:82%] text-[clamp(52px,8vw,104px)] leading-[0.86] tracking-[-0.02em] uppercase text-white relative"
+          >
             HUDA
             <br />
             Sports
-          </h1>
-          <div
-            className="w-[220px] h-4 bg-lime relative"
+          </motion.h1>
+          <motion.div
+            variants={heroItem}
+            className="w-[220px] h-4 bg-lime relative origin-left"
             style={{ clipPath: "polygon(0% 62%, 8% 18%, 96% 0%, 100% 52%, 88% 100%, 4% 96%)" }}
           />
-          <p className="mt-1.5 text-[18.5px] font-semibold leading-[1.35] max-w-[30ch] text-white relative">
+          <motion.p
+            variants={heroItem}
+            className="mt-1.5 text-[18.5px] font-semibold leading-[1.35] max-w-[30ch] text-white relative"
+          >
             Streetwear &amp; performance essentials for a new generation.
-          </p>
-          <p className="text-[14.5px] leading-relaxed max-w-[36ch] text-[#ADADAD] relative">
+          </motion.p>
+          <motion.p variants={heroItem} className="text-[14.5px] leading-relaxed max-w-[36ch] text-[#ADADAD] relative">
             More than clothing. A mindset.
             <br />
             Built for those who move, create and belong to something bigger.
-          </p>
-          <div className="flex items-center gap-5.5 flex-wrap mt-2.5 relative">
+          </motion.p>
+          <motion.div variants={heroItem} className="flex items-center gap-5.5 flex-wrap mt-2.5 relative">
             <CtaLink href="/shop">Shop now</CtaLink>
-            <button
+            <motion.button
               onClick={scrollToVideo}
+              whileHover="hover"
+              initial="rest"
               className="flex items-center gap-3 bg-transparent border-none text-white cursor-pointer p-0"
             >
-              <span className="w-10 h-10 border-[1.5px] border-white/70 rounded-full inline-flex items-center justify-center text-xs">
+              <motion.span
+                variants={{ rest: { borderColor: "rgba(255,255,255,0.7)", scale: 1 }, hover: { borderColor: "#C8F32B", scale: 1.08 } }}
+                transition={{ duration: 0.2 }}
+                className="w-10 h-10 border-[1.5px] rounded-full inline-flex items-center justify-center text-xs"
+              >
                 ▶
-              </span>
+              </motion.span>
               <span className="font-display font-bold text-[12.5px] tracking-[0.1em] uppercase">Watch video</span>
-            </button>
-          </div>
-        </div>
+            </motion.button>
+          </motion.div>
+        </motion.div>
 
         <div className="flex-[1.45_1_460px] relative min-h-[430px] bg-ground-alt">
-          <div className="absolute inset-0 overflow-hidden" style={{ clipPath: "polygon(11% 0%, 100% 0%, 100% 100%, 0% 100%)" }}>
+          <motion.div
+            className="absolute inset-0 overflow-hidden"
+            style={{ clipPath: "polygon(11% 0%, 100% 0%, 100% 100%, 0% 100%)" }}
+            initial={{ opacity: 0, scale: 1.05 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.9, ease: EASE }}
+          >
             <Image
               src="/assets/hero-group-crop.png"
               alt="HUDA Sports athletes"
@@ -86,14 +126,14 @@ export default function Home() {
             />
             <div className="absolute top-0 right-0 w-[42%] h-[74%] bg-[linear-gradient(210deg,rgba(6,6,6,0.92)_0%,rgba(6,6,6,0.6)_30%,rgba(6,6,6,0.2)_56%,rgba(6,6,6,0)_78%)]" />
             <div className="absolute bottom-0 left-0 right-0 h-[34%] bg-[linear-gradient(0deg,rgba(6,6,6,0.72)_0%,rgba(6,6,6,0)_100%)]" />
-          </div>
+          </motion.div>
           <MarkerNote lines={["Same", "people", "higher", "goals"]} className="absolute top-10 right-8.5" rotate={-9} />
         </div>
       </section>
 
       {/* Collection cards */}
       <section className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-3.5 p-3.5 bg-ground">
-        <div
+        <Reveal
           className="relative grid grid-cols-[minmax(0,1.08fr)_minmax(0,1fr)] min-h-[262px] overflow-hidden"
           style={{ background: "linear-gradient(105deg, #16220A 0%, #0E1207 46%, #0B0B0B 100%)" }}
         >
@@ -125,9 +165,10 @@ export default function Home() {
               Shop men
             </CtaLink>
           </div>
-        </div>
+        </Reveal>
 
-        <div
+        <Reveal
+          delay={0.12}
           className="relative grid grid-cols-[minmax(0,1.08fr)_minmax(0,1fr)] min-h-[262px] overflow-hidden"
           style={{ background: "linear-gradient(105deg, #0C1718 0%, #0A1011 46%, #0B0B0B 100%)" }}
         >
@@ -159,12 +200,12 @@ export default function Home() {
               Shop team
             </CtaLink>
           </div>
-        </div>
+        </Reveal>
       </section>
 
       {/* Our Story */}
       <section id="story" className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] bg-ground-alt border-y border-hairline/90">
-        <div className="relative min-h-[380px] overflow-hidden">
+        <Reveal className="relative min-h-[380px] overflow-hidden">
           <Image
             src="/assets/our-story.jpg"
             alt="Team huddle"
@@ -178,8 +219,11 @@ export default function Home() {
             style={{ transform: "skewX(-11deg)" }}
           />
           <MarkerNote lines={["Good", "people", "better", "tomorrow"]} className="absolute bottom-11 left-7" rotate={-8} />
-        </div>
-        <div className="pl-12 pr-[150px] py-14.5 flex flex-col justify-center gap-5 relative max-[900px]:pr-8">
+        </Reveal>
+        <Reveal
+          delay={0.12}
+          className="pl-12 pr-[150px] py-14.5 flex flex-col justify-center gap-5 relative max-[900px]:pr-8"
+        >
           <h2 className="m-0 font-display italic font-black [font-stretch:85%] text-[clamp(32px,3.8vw,46px)] tracking-[-0.01em] uppercase text-white">
             Our Story
           </h2>
@@ -214,13 +258,13 @@ export default function Home() {
             className="absolute top-14 right-4.5 w-[120px]"
             rotate={-8}
           />
-        </div>
+        </Reveal>
       </section>
 
       {/* Best Sellers */}
       <section id="best-sellers" className="px-6 pt-13.5 pb-15 bg-ground">
         <div className="max-w-[1240px] mx-auto">
-          <div className="flex items-end justify-between gap-5 mb-6.5 flex-wrap">
+          <Reveal className="flex items-end justify-between gap-5 mb-6.5 flex-wrap">
             <div className="flex flex-col gap-2.5">
               <span className="w-13.5 h-[5px] bg-lime" />
               <h2 className="m-0 font-display italic font-black [font-stretch:85%] text-[clamp(28px,3.4vw,42px)] tracking-[-0.01em] uppercase text-white">
@@ -233,18 +277,20 @@ export default function Home() {
             >
               View all →
             </Link>
-          </div>
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(210px,1fr))] gap-3.5">
+          </Reveal>
+          <StaggerGroup className="grid grid-cols-[repeat(auto-fit,minmax(210px,1fr))] gap-3.5">
             {bestSellers(4).map((p) => (
-              <ProductCard key={p.slug} product={p} aspect="square" />
+              <StaggerItem key={p.slug}>
+                <ProductCard product={p} aspect="square" />
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerGroup>
         </div>
       </section>
 
       {/* More than a brand */}
       <section className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] bg-ground border-t border-hairline/90">
-        <div className="relative min-h-[320px] overflow-hidden">
+        <Reveal className="relative min-h-[320px] overflow-hidden">
           <Image
             src="/assets/team-back-banner.jpg"
             alt="Team wearing Combat Ton Nafs tees"
@@ -259,8 +305,8 @@ export default function Home() {
             align="left"
             swashWidth={96}
           />
-        </div>
-        <div className="bg-lime text-ground px-10 py-12 flex flex-col justify-center gap-4.5">
+        </Reveal>
+        <Reveal delay={0.12} className="bg-lime text-ground px-10 py-12 flex flex-col justify-center gap-4.5">
           <h2 className="m-0 font-display italic font-black [font-stretch:85%] text-[clamp(28px,3.4vw,40px)] leading-[0.98] uppercase">
             More
             <br />
@@ -273,7 +319,7 @@ export default function Home() {
           <CtaLink href="/shop" variant="dark" className="self-start mt-2">
             Shop the collection
           </CtaLink>
-        </div>
+        </Reveal>
       </section>
 
       {/* Quote */}
@@ -294,7 +340,7 @@ export default function Home() {
           className="absolute -top-[12%] left-[30%] w-[14%] h-[124%] bg-[linear-gradient(90deg,rgba(255,255,255,0.05)_0%,rgba(255,255,255,0)_100%)] pointer-events-none"
           style={{ transform: "skewX(-11deg)" }}
         />
-        <div className="relative z-10 max-w-[1240px] mx-auto px-6 pl-12 py-13 flex items-center justify-between gap-7 min-h-[300px] flex-wrap">
+        <Reveal className="relative z-10 max-w-[1240px] mx-auto px-6 pl-12 py-13 flex items-center justify-between gap-7 min-h-[300px] flex-wrap">
           <div className="flex flex-col gap-3.5 max-w-[460px]">
             <p className="m-0 font-display font-black text-[58px] leading-[0.55] text-white">&#8220;</p>
             <p className="m-0 text-[clamp(23px,2.7vw,32px)] font-semibold leading-[1.24] text-white max-w-[24ch] text-pretty">
@@ -312,13 +358,13 @@ export default function Home() {
             rotate={-9}
             align="left"
           />
-        </div>
+        </Reveal>
       </section>
 
       {/* Video */}
       <section id="video" className="px-6 pt-14 pb-15 bg-ground border-t border-hairline/90">
         <div className="max-w-[1240px] mx-auto grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-10 items-center">
-          <div className="relative bg-card border border-white/10 overflow-hidden aspect-video">
+          <Reveal className="relative bg-card border border-white/10 overflow-hidden aspect-video">
             <video
               ref={videoRef}
               src="/assets/huda-video.mp4"
@@ -327,22 +373,28 @@ export default function Home() {
               preload="metadata"
               className="w-full h-full block object-cover [filter:grayscale(0.5)_brightness(0.5)] bg-card"
             />
-            <div
+            <motion.div
               onClick={playVideo}
+              whileHover="hover"
+              initial="rest"
               className="absolute inset-0 flex flex-col items-center justify-center gap-4.5 cursor-pointer bg-black/20"
             >
-              <span className="w-[62px] h-[62px] rounded-full bg-white/92 text-ground inline-flex items-center justify-center text-[19px] pl-1">
+              <motion.span
+                variants={{ rest: { scale: 1 }, hover: { scale: 1.08 } }}
+                transition={{ duration: 0.2 }}
+                className="w-[62px] h-[62px] rounded-full bg-white/92 text-ground inline-flex items-center justify-center text-[19px] pl-1"
+              >
                 ▶
-              </span>
+              </motion.span>
               <p className="m-0 font-display font-extrabold text-[13.5px] tracking-[0.14em] uppercase text-white">
                 Click to play
               </p>
               <p className="-mt-1.5 text-[11px] tracking-[0.14em] uppercase text-[#B0B0B0]">
                 Training. Team. Lifestyle.
               </p>
-            </div>
-          </div>
-          <div className="flex flex-col gap-4 relative">
+            </motion.div>
+          </Reveal>
+          <Reveal delay={0.12} className="flex flex-col gap-4 relative">
             <div className="flex items-start justify-between gap-5">
               <span className="w-13.5 h-[5px] bg-lime" />
               <div className="flex gap-3 items-center flex-wrap">
@@ -367,19 +419,22 @@ export default function Home() {
               Training. Team. Lifestyle. Press play and see the HUDA Sports story — training, team and
               lifestyle.
             </p>
-            <button
+            <motion.button
               onClick={playVideo}
-              className="self-start mt-1.5 bg-white text-ground border-none font-display font-extrabold text-[12.5px] tracking-[0.1em] uppercase px-5.5 py-3.5 cursor-pointer inline-flex items-center gap-2.5 hover:bg-lime transition-colors"
+              whileHover={{ backgroundColor: "#C8F32B" }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ duration: 0.18 }}
+              className="self-start mt-1.5 bg-white text-ground border-none font-display font-extrabold text-[12.5px] tracking-[0.1em] uppercase px-5.5 py-3.5 cursor-pointer inline-flex items-center gap-2.5"
             >
               Play the film <span className="text-sm">→</span>
-            </button>
+            </motion.button>
             <MarkerNote
               lines={["Stay connected", "stay in motion"]}
               className="mt-4.5 self-end"
               rotate={-6}
               swashWidth={120}
             />
-          </div>
+          </Reveal>
         </div>
       </section>
 

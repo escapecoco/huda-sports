@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { motion } from "motion/react";
 import { useCart } from "@/lib/cart-context";
 import { TAG_COLORS, type Product } from "@/lib/products";
 
@@ -27,7 +28,17 @@ export function ProductCard({
   }
 
   return (
-    <article className="bg-card border border-hairline flex flex-col transition-[border-color,transform] duration-200 hover:border-lime/55 hover:-translate-y-[3px]">
+    <motion.article
+      className="bg-card border border-hairline flex flex-col"
+      initial="rest"
+      whileHover="hover"
+      animate="rest"
+      variants={{
+        rest: { borderColor: "rgba(255,255,255,0.08)", y: 0 },
+        hover: { borderColor: "rgba(200,243,43,0.55)", y: -3 },
+      }}
+      transition={{ duration: 0.22, ease: "easeOut" }}
+    >
       <Link href={`/shop/${product.slug}`} className="block">
         <div
           className={`relative overflow-hidden bg-[#121212] ${
@@ -35,9 +46,11 @@ export function ProductCard({
           }`}
         >
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,#232323_0%,#141414_68%,#0B0B0B_100%)]" />
-          <div
+          <motion.div
             className="absolute inset-0 bg-cover [filter:contrast(1.06)_saturate(1.04)_brightness(1.02)]"
             style={{ backgroundImage: `url(${product.image})`, backgroundPosition: product.focus }}
+            variants={{ rest: { scale: 1 }, hover: { scale: 1.05 } }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
           />
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,6,6,0.32)_0%,rgba(6,6,6,0)_38%,rgba(6,6,6,0.5)_100%)]" />
           <span
@@ -75,15 +88,18 @@ export function ProductCard({
         </div>
         <div className="flex items-center justify-between gap-3 mt-auto">
           <p className="font-display font-extrabold text-[16px] text-white">${product.price.toFixed(2)}</p>
-          <button
+          <motion.button
             onClick={quickAdd}
-            className="w-[38px] h-[38px] bg-lime border-none text-ground text-[15px] cursor-pointer inline-flex items-center justify-center hover:bg-lime-hover transition-colors"
+            whileHover={{ scale: 1.08, backgroundColor: "#E4FF7A" }}
+            whileTap={{ scale: 0.92 }}
+            transition={{ duration: 0.15 }}
+            className="w-[38px] h-[38px] bg-lime border-none text-ground text-[15px] cursor-pointer inline-flex items-center justify-center"
             aria-label={`Add ${product.name} to cart`}
           >
             🛒
-          </button>
+          </motion.button>
         </div>
       </div>
-    </article>
+    </motion.article>
   );
 }

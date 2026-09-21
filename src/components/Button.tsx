@@ -1,5 +1,9 @@
+"use client";
+
 import Link from "next/link";
-import type { ButtonHTMLAttributes } from "react";
+import { motion } from "motion/react";
+
+const MotionLink = motion.create(Link);
 
 type Variant = "lime" | "white" | "dark" | "outline";
 
@@ -13,6 +17,10 @@ const variantClasses: Record<Variant, string> = {
 
 const base =
   "inline-flex items-center gap-2.5 font-display font-extrabold text-[12.5px] uppercase tracking-[0.1em] px-6 py-[15px] transition-colors";
+
+const arrowVariants = { rest: { x: 0 }, hover: { x: 3 } };
+const tapAnimation = { scale: 0.97 };
+const hoverTransition = { duration: 0.18, ease: "easeOut" as const };
 
 export function CtaLink({
   href,
@@ -28,10 +36,21 @@ export function CtaLink({
   arrow?: boolean;
 }) {
   return (
-    <Link href={href} className={`${base} ${variantClasses[variant]} ${className}`}>
+    <MotionLink
+      href={href}
+      className={`${base} ${variantClasses[variant]} ${className}`}
+      initial="rest"
+      whileHover="hover"
+      whileTap={tapAnimation}
+      transition={hoverTransition}
+    >
       {children}
-      {arrow && <span className="text-[15px]">→</span>}
-    </Link>
+      {arrow && (
+        <motion.span className="text-[15px]" variants={arrowVariants}>
+          →
+        </motion.span>
+      )}
+    </MotionLink>
   );
 }
 
@@ -40,17 +59,35 @@ export function CtaButton({
   variant = "lime",
   className = "",
   arrow = true,
-  ...rest
+  onClick,
+  disabled,
+  type = "button",
 }: {
   children: React.ReactNode;
   variant?: Variant;
   className?: string;
   arrow?: boolean;
-} & ButtonHTMLAttributes<HTMLButtonElement>) {
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
+  disabled?: boolean;
+  type?: "button" | "submit" | "reset";
+}) {
   return (
-    <button className={`${base} cursor-pointer ${variantClasses[variant]} ${className}`} {...rest}>
+    <motion.button
+      type={type}
+      onClick={onClick}
+      disabled={disabled}
+      className={`${base} cursor-pointer ${variantClasses[variant]} ${className}`}
+      initial="rest"
+      whileHover="hover"
+      whileTap={tapAnimation}
+      transition={hoverTransition}
+    >
       {children}
-      {arrow && <span className="text-[15px]">→</span>}
-    </button>
+      {arrow && (
+        <motion.span className="text-[15px]" variants={arrowVariants}>
+          →
+        </motion.span>
+      )}
+    </motion.button>
   );
 }

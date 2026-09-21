@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "motion/react";
+import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import {
   footerCompanyLinks,
   footerLegalLinks,
@@ -26,8 +28,8 @@ export function Footer() {
 
   return (
     <footer className="bg-ground-alt border-t border-hairline pt-12 px-6 pb-5.5">
-      <div className="max-w-[1240px] mx-auto grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-6">
-        <div className="flex flex-col gap-3">
+      <StaggerGroup className="max-w-[1240px] mx-auto grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-6">
+        <StaggerItem className="flex flex-col gap-3">
           <div className="flex items-center gap-2.5 flex-wrap">
             <Image
               src="/assets/logo.png"
@@ -52,9 +54,9 @@ export function Footer() {
               </a>
             ))}
           </div>
-        </div>
+        </StaggerItem>
 
-        <div className="flex flex-col gap-2.5">
+        <StaggerItem className="flex flex-col gap-2.5">
           <p className="mb-1 font-display font-extrabold text-[11.5px] tracking-[0.16em] uppercase text-white">
             Shop
           </p>
@@ -63,9 +65,9 @@ export function Footer() {
               {l.label}
             </Link>
           ))}
-        </div>
+        </StaggerItem>
 
-        <div className="flex flex-col gap-2.5">
+        <StaggerItem className="flex flex-col gap-2.5">
           <p className="mb-1 font-display font-extrabold text-[11.5px] tracking-[0.16em] uppercase text-white">
             Company
           </p>
@@ -74,9 +76,9 @@ export function Footer() {
               {l.label}
             </Link>
           ))}
-        </div>
+        </StaggerItem>
 
-        <div className="flex flex-col gap-3">
+        <StaggerItem className="flex flex-col gap-3">
           <p className="font-display font-extrabold text-[11.5px] tracking-[0.16em] uppercase text-white">
             Newsletter
           </p>
@@ -91,16 +93,19 @@ export function Footer() {
               onChange={(e) => setEmail(e.target.value)}
               className="flex-1 min-w-0 bg-input border border-white/16 text-white text-[13px] px-3 py-[11px] outline-none focus:border-lime"
             />
-            <button
+            <motion.button
               onClick={subscribe}
-              className="bg-lime border-none text-ground text-[15px] font-bold px-4 cursor-pointer hover:bg-lime-hover transition-colors"
+              whileHover={{ backgroundColor: "#E4FF7A", x: 2 }}
+              whileTap={{ scale: 0.94 }}
+              transition={{ duration: 0.15 }}
+              className="bg-lime border-none text-ground text-[15px] font-bold px-4 cursor-pointer"
             >
               →
-            </button>
+            </motion.button>
           </div>
           <p className="text-[12px] text-lime min-h-4">{note}</p>
-        </div>
-      </div>
+        </StaggerItem>
+      </StaggerGroup>
 
       <div className="max-w-[1240px] mx-auto mt-8.5 pt-4.5 border-t border-hairline flex items-center justify-between gap-4.5 flex-wrap">
         <p className="text-[12px] text-ink-muted">© 2024 HUDA Sports. All rights reserved.</p>

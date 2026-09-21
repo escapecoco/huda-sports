@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { AnimatePresence, motion } from "motion/react";
 import { useCart } from "@/lib/cart-context";
 import { navLinks } from "@/lib/site";
 
@@ -9,7 +10,11 @@ export function Header() {
   const { count } = useCart();
 
   return (
-    <header className="sticky top-0 z-50 bg-ground/95 backdrop-blur-md border-b border-hairline">
+    <motion.header
+      initial={{ y: -16, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className="sticky top-0 z-50 bg-ground/95 backdrop-blur-md border-b border-hairline">
       <div className="max-w-[1240px] mx-auto px-6 py-3.5 flex items-center gap-x-7 gap-y-3.5 flex-wrap">
         <Link href="/" className="flex items-center gap-2.5 shrink-0">
           <Image
@@ -52,9 +57,18 @@ export function Header() {
           </Link>
           <Link href="/cart" className="flex items-center gap-[7px] text-white p-1">
             <span className="text-[17px] leading-none">🛒</span>
-            <span className="min-w-5 h-5 inline-flex items-center justify-center bg-lime text-ground text-[11.5px] font-bold rounded-full px-1.5">
-              {count}
-            </span>
+            <AnimatePresence mode="popLayout" initial={false}>
+              <motion.span
+                key={count}
+                initial={{ scale: 0.4, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.4, opacity: 0 }}
+                transition={{ duration: 0.22, ease: "easeOut" }}
+                className="min-w-5 h-5 inline-flex items-center justify-center bg-lime text-ground text-[11.5px] font-bold rounded-full px-1.5"
+              >
+                {count}
+              </motion.span>
+            </AnimatePresence>
           </Link>
           <Link
             href="/shop"
@@ -64,6 +78,6 @@ export function Header() {
           </Link>
         </div>
       </div>
-    </header>
+    </motion.header>
   );
 }
