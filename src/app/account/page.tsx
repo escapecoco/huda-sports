@@ -3,8 +3,27 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { AnimatePresence, motion } from "motion/react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
+
+const EASE = [0.16, 1, 0.3, 1] as const;
+
+const formContainer = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.08, delayChildren: 0.08 } },
+};
+const formItem = {
+  hidden: { opacity: 0, y: 18 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE } },
+};
+
+const tabContentVariants = {
+  hidden: { opacity: 0, y: 10 },
+  show: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -10 },
+};
 
 const SWASH_CLIP =
   "polygon(0% 74%, 4% 40%, 18% 20%, 48% 8%, 78% 4%, 96% 10%, 100% 34%, 97% 62%, 80% 82%, 50% 92%, 22% 98%, 6% 96%)";
@@ -81,14 +100,16 @@ function Chip({
   children: React.ReactNode;
 }) {
   return (
-    <button
+    <motion.button
       onClick={onClick}
+      whileTap={{ scale: 0.96 }}
+      transition={{ duration: 0.15, ease: EASE }}
       className={`font-display font-extrabold text-[11.5px] tracking-[0.14em] uppercase px-[17px] py-[11px] cursor-pointer border transition-colors ${
         active ? "bg-lime border-lime text-ground" : "bg-transparent border-white/16 text-[#BDBDBD] hover:border-white/30"
       }`}
     >
       {children}
-    </button>
+    </motion.button>
   );
 }
 
@@ -135,36 +156,45 @@ export default function AccountPage() {
 
       {!signedIn && (
         <section className="relative flex flex-wrap items-stretch bg-ground-alt border-b border-hairline/90">
-          <div className="flex-[1_1_340px] z-[2] pt-[54px] px-8 pb-[52px] pl-12 flex flex-col justify-center gap-4.5">
-            <p className="m-0 text-[11.5px] tracking-[0.3em] uppercase text-[#BFBFBF]">
+          <motion.div
+            className="flex-[1_1_340px] z-[2] pt-[54px] px-8 pb-[52px] pl-12 flex flex-col justify-center gap-4.5"
+            initial="hidden"
+            animate="show"
+            variants={formContainer}
+          >
+            <motion.p variants={formItem} className="m-0 text-[11.5px] tracking-[0.3em] uppercase text-[#BFBFBF]">
               <Link href="/" className="text-[#BFBFBF] hover:text-lime transition-colors">
                 Home
               </Link>{" "}
               / Account
-            </p>
-            <h1 className="m-0 font-display italic font-black [font-stretch:84%] text-[clamp(30px,4.6vw,52px)] leading-[0.9] tracking-[-0.02em] uppercase text-white">
+            </motion.p>
+            <motion.h1
+              variants={formItem}
+              className="m-0 font-display italic font-black [font-stretch:84%] text-[clamp(30px,4.6vw,52px)] leading-[0.9] tracking-[-0.02em] uppercase text-white"
+            >
               {isSignup ? "Join the squad" : "Welcome back"}
-            </h1>
-            <span
+            </motion.h1>
+            <motion.span
+              variants={formItem}
               className="block w-40 h-3 bg-lime"
               style={{ clipPath: SWASH_CLIP }}
             />
-            <p className="m-0 text-[15px] leading-[1.7] text-[#B4B4B4] max-w-[40ch]">
+            <motion.p variants={formItem} className="m-0 text-[15px] leading-[1.7] text-[#B4B4B4] max-w-[40ch]">
               {isSignup
                 ? "One account to follow your orders, save your sizes and hear about restocks first."
                 : "Sign in to see your orders, addresses and saved sizes."}
-            </p>
+            </motion.p>
 
-            <div className="flex gap-2 flex-wrap mt-1">
+            <motion.div variants={formItem} className="flex gap-2 flex-wrap mt-1">
               <Chip active={mode === "signin"} onClick={() => { setMode("signin"); setError(""); }}>
                 Sign in
               </Chip>
               <Chip active={mode === "signup"} onClick={() => { setMode("signup"); setError(""); }}>
                 Create account
               </Chip>
-            </div>
+            </motion.div>
 
-            <div className="flex flex-col gap-3 max-w-[420px] mt-1">
+            <motion.div variants={formItem} className="flex flex-col gap-3 max-w-[420px] mt-1">
               {isSignup && (
                 <input
                   type="text"
@@ -188,12 +218,14 @@ export default function AccountPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 className="bg-input border border-white/16 text-white text-sm p-3.5 outline-none focus:border-lime"
               />
-              <button
+              <motion.button
                 onClick={submit}
+                whileTap={{ scale: 0.97 }}
+                transition={{ duration: 0.15, ease: EASE }}
                 className="bg-lime hover:bg-lime-hover text-ground border-none font-display font-extrabold text-[13px] tracking-[0.1em] uppercase px-[22px] py-4 cursor-pointer flex items-center justify-center gap-2.5 transition-colors"
               >
                 {isSignup ? "Create account" : "Sign in"} <span className="text-[15px]">→</span>
-              </button>
+              </motion.button>
               <p className="m-0 text-[12.5px] text-[#FF8A8A] min-h-[18px]">{error}</p>
               <p className="m-0 text-[13px] leading-[1.6] text-[#8C8C8C]">
                 No account needed to follow a parcel —{" "}
@@ -202,13 +234,16 @@ export default function AccountPage() {
                 </Link>
                 .
               </p>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           <div className="flex-[1.15_1_400px] relative min-h-[380px]">
-            <div
+            <motion.div
               className="absolute inset-0 overflow-hidden"
               style={{ clipPath: "polygon(11% 0%, 100% 0%, 100% 100%, 0% 100%)" }}
+              initial={{ opacity: 0, scale: 1.05 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.9, ease: EASE }}
             >
               <Image
                 src="/assets/brand-banner.jpg"
@@ -219,7 +254,7 @@ export default function AccountPage() {
               />
               <div className="absolute inset-0 bg-[linear-gradient(97deg,rgba(10,10,10,0.95)_0%,rgba(10,10,10,0.45)_10%,rgba(10,10,10,0)_30%)]" />
               <div className="absolute bottom-0 left-0 right-0 h-[34%] bg-[linear-gradient(0deg,rgba(6,6,6,0.72)_0%,rgba(6,6,6,0)_100%)]" />
-            </div>
+            </motion.div>
           </div>
         </section>
       )}
@@ -254,115 +289,127 @@ export default function AccountPage() {
                 ))}
               </div>
 
-              {tab === "Orders" && (
-                <div className="flex flex-col gap-3.5">
-                  {ORDERS.map((o) => (
-                    <article
-                      key={o.number}
-                      className="bg-card border border-hairline px-5 py-4.5 flex flex-col gap-3.5"
-                    >
-                      <div className="flex items-start justify-between gap-4 flex-wrap">
-                        <div className="flex flex-col gap-1">
-                          <p className="m-0 font-display font-black text-[15px] text-white">{o.number}</p>
-                          <p className="m-0 text-xs tracking-[0.12em] uppercase text-[#8C8C8C]">
-                            {o.date} · {o.items} items
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={tab}
+                  initial="hidden"
+                  animate="show"
+                  exit="exit"
+                  variants={tabContentVariants}
+                  transition={{ duration: 0.3, ease: EASE }}
+                >
+                  {tab === "Orders" && (
+                    <StaggerGroup className="flex flex-col gap-3.5">
+                      {ORDERS.map((o) => (
+                        <StaggerItem key={o.number}>
+                          <article className="bg-card border border-hairline px-5 py-4.5 flex flex-col gap-3.5">
+                            <div className="flex items-start justify-between gap-4 flex-wrap">
+                              <div className="flex flex-col gap-1">
+                                <p className="m-0 font-display font-black text-[15px] text-white">{o.number}</p>
+                                <p className="m-0 text-xs tracking-[0.12em] uppercase text-[#8C8C8C]">
+                                  {o.date} · {o.items} items
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-3.5 flex-wrap">
+                                <span
+                                  className="font-display font-extrabold text-[10px] tracking-[0.14em] uppercase px-2.5 py-1.5 text-ground"
+                                  style={{ background: STATUS_COLORS[o.status] }}
+                                >
+                                  {o.status}
+                                </span>
+                                <p className="m-0 font-display font-extrabold text-[16px] text-white">{o.total}</p>
+                              </div>
+                            </div>
+                            <p className="m-0 text-[13.5px] leading-[1.6] text-[#A8A8A8]">{o.contents}</p>
+                            <div className="flex gap-2.5 flex-wrap">
+                              <Link
+                                href="/order-tracking"
+                                className="bg-white hover:bg-lime text-ground font-display font-extrabold text-[11px] tracking-[0.12em] uppercase px-[17px] py-[11px] transition-colors"
+                              >
+                                Track
+                              </Link>
+                              <Link
+                                href="/shop"
+                                className="bg-transparent border border-white/22 text-[#DCDCDC] hover:border-lime hover:text-lime font-display font-extrabold text-[11px] tracking-[0.12em] uppercase px-[17px] py-[11px] transition-colors"
+                              >
+                                Buy again
+                              </Link>
+                              <Link
+                                href="/contact"
+                                className="bg-transparent border border-white/22 text-[#DCDCDC] hover:border-lime hover:text-lime font-display font-extrabold text-[11px] tracking-[0.12em] uppercase px-[17px] py-[11px] transition-colors"
+                              >
+                                Get help
+                              </Link>
+                            </div>
+                          </article>
+                        </StaggerItem>
+                      ))}
+                    </StaggerGroup>
+                  )}
+
+                  {tab === "Addresses" && (
+                    <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-3.5">
+                      {ADDRESSES.map((a) => (
+                        <div key={a.label} className="bg-card border border-hairline p-5 flex flex-col gap-2.5">
+                          <p className="m-0 font-display font-extrabold text-[11px] tracking-[0.16em] uppercase text-lime">
+                            {a.label}
                           </p>
-                        </div>
-                        <div className="flex items-center gap-3.5 flex-wrap">
-                          <span
-                            className="font-display font-extrabold text-[10px] tracking-[0.14em] uppercase px-2.5 py-1.5 text-ground"
-                            style={{ background: STATUS_COLORS[o.status] }}
+                          <p className="m-0 text-sm leading-[1.7] text-[#DCDCDC]">
+                            {a.name}
+                            <br />
+                            {a.street}
+                            <br />
+                            {a.city}
+                            <br />
+                            {a.country}
+                          </p>
+                          <Link
+                            href="/contact"
+                            className="mt-1 font-display font-extrabold text-[11px] tracking-[0.12em] uppercase text-lime hover:text-lime-hover"
                           >
-                            {o.status}
-                          </span>
-                          <p className="m-0 font-display font-extrabold text-[16px] text-white">{o.total}</p>
+                            Edit →
+                          </Link>
                         </div>
-                      </div>
-                      <p className="m-0 text-[13.5px] leading-[1.6] text-[#A8A8A8]">{o.contents}</p>
-                      <div className="flex gap-2.5 flex-wrap">
-                        <Link
-                          href="/order-tracking"
-                          className="bg-white hover:bg-lime text-ground font-display font-extrabold text-[11px] tracking-[0.12em] uppercase px-[17px] py-[11px] transition-colors"
-                        >
-                          Track
-                        </Link>
-                        <Link
-                          href="/shop"
-                          className="bg-transparent border border-white/22 text-[#DCDCDC] hover:border-lime hover:text-lime font-display font-extrabold text-[11px] tracking-[0.12em] uppercase px-[17px] py-[11px] transition-colors"
-                        >
-                          Buy again
-                        </Link>
-                        <Link
-                          href="/contact"
-                          className="bg-transparent border border-white/22 text-[#DCDCDC] hover:border-lime hover:text-lime font-display font-extrabold text-[11px] tracking-[0.12em] uppercase px-[17px] py-[11px] transition-colors"
-                        >
-                          Get help
-                        </Link>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              )}
-
-              {tab === "Addresses" && (
-                <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-3.5">
-                  {ADDRESSES.map((a) => (
-                    <div key={a.label} className="bg-card border border-hairline p-5 flex flex-col gap-2.5">
-                      <p className="m-0 font-display font-extrabold text-[11px] tracking-[0.16em] uppercase text-lime">
-                        {a.label}
-                      </p>
-                      <p className="m-0 text-sm leading-[1.7] text-[#DCDCDC]">
-                        {a.name}
-                        <br />
-                        {a.street}
-                        <br />
-                        {a.city}
-                        <br />
-                        {a.country}
-                      </p>
-                      <Link
-                        href="/contact"
-                        className="mt-1 font-display font-extrabold text-[11px] tracking-[0.12em] uppercase text-lime hover:text-lime-hover"
-                      >
-                        Edit →
-                      </Link>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              )}
+                  )}
 
-              {tab === "Details" && (
-                <div className="flex flex-col gap-3 max-w-[440px]">
-                  <input
-                    type="text"
-                    placeholder="First name"
-                    value={first}
-                    onChange={(e) => setFirst(e.target.value)}
-                    className="bg-input border border-white/16 text-white text-sm p-3.5 outline-none focus:border-lime"
-                  />
-                  <input
-                    type="email"
-                    placeholder="Email address"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="bg-input border border-white/16 text-white text-sm p-3.5 outline-none focus:border-lime"
-                  />
-                  <input
-                    type="tel"
-                    placeholder="Phone"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="bg-input border border-white/16 text-white text-sm p-3.5 outline-none focus:border-lime"
-                  />
-                  <button
-                    onClick={saveDetails}
-                    className="self-start bg-lime hover:bg-lime-hover text-ground border-none font-display font-extrabold text-[12.5px] tracking-[0.1em] uppercase px-[22px] py-[15px] cursor-pointer transition-colors"
-                  >
-                    Save changes
-                  </button>
-                  <p className="m-0 text-[12.5px] text-lime min-h-[18px]">{saved}</p>
-                </div>
-              )}
+                  {tab === "Details" && (
+                    <div className="flex flex-col gap-3 max-w-[440px]">
+                      <input
+                        type="text"
+                        placeholder="First name"
+                        value={first}
+                        onChange={(e) => setFirst(e.target.value)}
+                        className="bg-input border border-white/16 text-white text-sm p-3.5 outline-none focus:border-lime"
+                      />
+                      <input
+                        type="email"
+                        placeholder="Email address"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="bg-input border border-white/16 text-white text-sm p-3.5 outline-none focus:border-lime"
+                      />
+                      <input
+                        type="tel"
+                        placeholder="Phone"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        className="bg-input border border-white/16 text-white text-sm p-3.5 outline-none focus:border-lime"
+                      />
+                      <motion.button
+                        onClick={saveDetails}
+                        whileTap={{ scale: 0.97 }}
+                        transition={{ duration: 0.15, ease: EASE }}
+                        className="self-start bg-lime hover:bg-lime-hover text-ground border-none font-display font-extrabold text-[12.5px] tracking-[0.1em] uppercase px-[22px] py-[15px] cursor-pointer transition-colors"
+                      >
+                        Save changes
+                      </motion.button>
+                      <p className="m-0 text-[12.5px] text-lime min-h-[18px]">{saved}</p>
+                    </div>
+                  )}
+                </motion.div>
+              </AnimatePresence>
             </div>
 
             <div className="flex flex-col gap-3.5">

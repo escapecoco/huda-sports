@@ -3,10 +3,31 @@
 import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { motion } from "motion/react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { products } from "@/lib/products";
+
+const EASE = [0.16, 1, 0.3, 1] as const;
+
+const heroContainer = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.08, delayChildren: 0.06 } },
+};
+const heroItem = {
+  hidden: { opacity: 0, y: 18 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE } },
+};
+
+const resultsContainer = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.05, delayChildren: 0.02 } },
+};
+const resultsItem = {
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: EASE } },
+};
 
 const SWASH_CLIP =
   "polygon(0% 74%, 4% 40%, 18% 20%, 48% 8%, 78% 4%, 96% 10%, 100% 34%, 97% 62%, 80% 82%, 50% 92%, 22% 98%, 6% 96%)";
@@ -74,8 +95,13 @@ function SearchPageInner() {
       <Header />
 
       <section className="bg-ground-alt border-b border-hairline/90">
-        <div className="max-w-[1240px] mx-auto px-6 pt-10.5 pb-9 flex flex-col gap-4.5">
-          <div className="flex flex-col gap-3">
+        <motion.div
+          className="max-w-[1240px] mx-auto px-6 pt-10.5 pb-9 flex flex-col gap-4.5"
+          initial="hidden"
+          animate="show"
+          variants={heroContainer}
+        >
+          <motion.div variants={heroItem} className="flex flex-col gap-3">
             <p className="m-0 text-[11.5px] tracking-[0.3em] uppercase text-[#BFBFBF]">
               <Link href="/" className="text-[#BFBFBF] hover:text-lime transition-colors">
                 Home
@@ -86,9 +112,10 @@ function SearchPageInner() {
               Search
             </h1>
             <span className="block w-[150px] h-3 bg-lime" style={{ clipPath: SWASH_CLIP }} />
-          </div>
+          </motion.div>
 
-          <input
+          <motion.input
+            variants={heroItem}
             type="text"
             placeholder="Search products, pages or help topics"
             value={query}
@@ -96,25 +123,27 @@ function SearchPageInner() {
             className="max-w-[620px] bg-input border border-white/20 text-white text-base p-4 outline-none focus:border-lime"
           />
 
-          <div className="flex items-center gap-3 flex-wrap">
+          <motion.div variants={heroItem} className="flex items-center gap-3 flex-wrap">
             <p className="m-0 text-[11.5px] tracking-[0.16em] uppercase text-[#8C8C8C]">Popular</p>
             <div className="flex gap-2 flex-wrap">
               {SUGGESTIONS.map((label) => (
-                <button
+                <motion.button
                   key={label}
                   onClick={() => setQuery(label)}
+                  whileTap={{ scale: 0.94 }}
+                  transition={{ duration: 0.15, ease: EASE }}
                   className="font-display font-extrabold text-[11px] tracking-[0.12em] uppercase px-3.5 py-2.5 cursor-pointer border border-white/16 bg-transparent text-[#DCDCDC] hover:border-lime hover:text-lime transition-colors"
                 >
                   {label}
-                </button>
+                </motion.button>
               ))}
             </div>
-          </div>
+          </motion.div>
 
-          <p className="m-0 text-[12.5px] tracking-[0.12em] uppercase text-lime">
+          <motion.p variants={heroItem} className="m-0 text-[12.5px] tracking-[0.12em] uppercase text-lime">
             {q ? `${total} results for “${query.trim()}”` : "Browse everything, or type to narrow it down"}
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
       </section>
 
       <section className="max-w-[1240px] mx-auto px-6 pt-8.5 pb-15 flex flex-col gap-8.5">
@@ -123,11 +152,19 @@ function SearchPageInner() {
             <p className="m-0 font-display font-extrabold text-xs tracking-[0.16em] uppercase text-white">
               Products
             </p>
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(230px,1fr))] gap-3.5">
+            <motion.div
+              key={`products-${q}`}
+              initial="hidden"
+              animate="show"
+              variants={resultsContainer}
+              className="grid grid-cols-[repeat(auto-fill,minmax(230px,1fr))] gap-3.5"
+            >
               {matchedProducts.map((p) => (
-                <ProductCard key={p.slug} product={p} aspect="portrait" />
+                <motion.div key={p.slug} variants={resultsItem}>
+                  <ProductCard product={p} aspect="portrait" />
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </div>
         )}
 
@@ -136,30 +173,43 @@ function SearchPageInner() {
             <p className="m-0 font-display font-extrabold text-xs tracking-[0.16em] uppercase text-white">
               Pages &amp; help
             </p>
-            <div className="border border-white/9 bg-ground-alt">
+            <motion.div
+              key={`pages-${q}`}
+              initial="hidden"
+              animate="show"
+              variants={resultsContainer}
+              className="border border-white/9 bg-ground-alt"
+            >
               {matchedPages.map((pg, i) => (
-                <Link
-                  key={pg.href}
-                  href={pg.href}
-                  className={`flex items-center justify-between gap-4.5 px-5.5 py-4.5 text-inherit hover:bg-white/[0.03] transition-colors ${
-                    i < matchedPages.length - 1 ? "border-b border-hairline" : ""
-                  }`}
-                >
-                  <div className="flex flex-col gap-1 min-w-0">
-                    <p className="m-0 font-display font-extrabold text-[12.5px] tracking-[0.12em] uppercase text-white">
-                      {pg.title}
-                    </p>
-                    <p className="m-0 text-[13.5px] leading-[1.6] text-[#A0A0A0] max-w-[60ch]">{pg.body}</p>
-                  </div>
-                  <span className="text-[15px] text-lime shrink-0">→</span>
-                </Link>
+                <motion.div key={pg.href} variants={resultsItem}>
+                  <Link
+                    href={pg.href}
+                    className={`flex items-center justify-between gap-4.5 px-5.5 py-4.5 text-inherit hover:bg-white/[0.03] transition-colors ${
+                      i < matchedPages.length - 1 ? "border-b border-hairline" : ""
+                    }`}
+                  >
+                    <div className="flex flex-col gap-1 min-w-0">
+                      <p className="m-0 font-display font-extrabold text-[12.5px] tracking-[0.12em] uppercase text-white">
+                        {pg.title}
+                      </p>
+                      <p className="m-0 text-[13.5px] leading-[1.6] text-[#A0A0A0] max-w-[60ch]">{pg.body}</p>
+                    </div>
+                    <span className="text-[15px] text-lime shrink-0">→</span>
+                  </Link>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </div>
         )}
 
         {noResults && (
-          <div className="border border-white/9 bg-card px-6.5 py-11 flex flex-col gap-3.5 items-start">
+          <motion.div
+            key={`empty-${q}`}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: EASE }}
+            className="border border-white/9 bg-card px-6.5 py-11 flex flex-col gap-3.5 items-start"
+          >
             <p className="m-0 font-display italic font-black text-[26px] uppercase text-white">Nothing found</p>
             <p className="m-0 text-[14.5px] leading-[1.7] text-[#A8A8A8] max-w-[44ch]">
               No product or page matches &#8220;{query}&#8221;. Try a shorter word, or browse the full collection.
@@ -178,7 +228,7 @@ function SearchPageInner() {
                 Ask us <span className="text-sm">→</span>
               </Link>
             </div>
-          </div>
+          </motion.div>
         )}
       </section>
 

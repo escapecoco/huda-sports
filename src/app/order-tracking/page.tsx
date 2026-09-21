@@ -2,9 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "motion/react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { CtaLink } from "@/components/Button";
+import { Reveal } from "@/components/motion/Reveal";
+import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
+
+const EASE = [0.16, 1, 0.3, 1] as const;
 
 const SWASH_CLIP =
   "polygon(0% 74%, 4% 40%, 18% 20%, 48% 8%, 78% 4%, 96% 10%, 100% 34%, 97% 62%, 80% 82%, 50% 92%, 22% 98%, 6% 96%)";
@@ -171,7 +176,12 @@ export default function OrderTrackingPage() {
             </p>
           </div>
 
-          <div className="flex flex-col gap-2.5 bg-ground/74 border border-white/14 p-5.5 min-w-[280px] flex-[0_1_380px]">
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55, ease: EASE }}
+            className="flex flex-col gap-2.5 bg-ground/74 border border-white/14 p-5.5 min-w-[280px] flex-[0_1_380px]"
+          >
             <input
               type="text"
               placeholder="Order number (HS-4821)"
@@ -186,14 +196,17 @@ export default function OrderTrackingPage() {
               onChange={(e) => setEmailInput(e.target.value)}
               className="bg-input border border-white/16 text-white text-sm p-3.5 outline-none focus:border-lime"
             />
-            <button
+            <motion.button
               onClick={lookup}
-              className="bg-lime hover:bg-lime-hover text-ground border-none font-display font-extrabold text-[12.5px] tracking-[0.1em] uppercase py-3.75 px-5 cursor-pointer flex items-center justify-center gap-2.5 transition-colors"
+              whileHover={{ backgroundColor: "#E4FF7A" }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ duration: 0.18, ease: "easeOut" }}
+              className="bg-lime text-ground border-none font-display font-extrabold text-[12.5px] tracking-[0.1em] uppercase py-3.75 px-5 cursor-pointer flex items-center justify-center gap-2.5"
             >
               Track order <span className="text-sm">→</span>
-            </button>
+            </motion.button>
             <p className="m-0 text-[12.5px] text-lime min-h-[18px]">{note}</p>
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -215,11 +228,11 @@ export default function OrderTrackingPage() {
               </div>
             </div>
 
-            <div className="border border-white/9 bg-ground-alt">
+            <StaggerGroup className="border border-white/9 bg-ground-alt">
               {result.events.map((e, i) => {
                 const on = e.state !== "next";
                 return (
-                  <div
+                  <StaggerItem
                     key={e.label}
                     className={`grid grid-cols-[14px_minmax(0,1fr)_auto] gap-4 items-start px-5 py-4.5 ${
                       i < result.events.length - 1 ? "border-b border-white/8" : ""
@@ -243,12 +256,12 @@ export default function OrderTrackingPage() {
                     <p className="m-0 text-xs tracking-[0.1em] uppercase text-[#8C8C8C] whitespace-nowrap">
                       {e.date}
                     </p>
-                  </div>
+                  </StaggerItem>
                 );
               })}
-            </div>
+            </StaggerGroup>
 
-            <div className="flex flex-col gap-3">
+            <Reveal className="flex flex-col gap-3">
               <p className="m-0 font-display font-extrabold text-xs tracking-[0.16em] uppercase text-white">
                 In this parcel
               </p>
@@ -278,11 +291,11 @@ export default function OrderTrackingPage() {
                   </p>
                 </article>
               ))}
-            </div>
+            </Reveal>
           </div>
 
           <div className="flex flex-col gap-3.5">
-            <div className="bg-ground-alt border border-white/9 p-5.5 flex flex-col gap-3">
+            <Reveal className="bg-ground-alt border border-white/9 p-5.5 flex flex-col gap-3">
               <p className="m-0 font-display font-extrabold text-xs tracking-[0.16em] uppercase text-white">
                 Carrier
               </p>
@@ -294,15 +307,29 @@ export default function OrderTrackingPage() {
                 <p className="m-0 text-sm text-[#B0B0B0]">Tracking no.</p>
                 <p className="m-0 text-[14.5px] font-semibold text-white">{trackingNumber}</p>
               </div>
-              <button
+              <motion.button
                 onClick={copyTracking}
-                className="mt-1 bg-white hover:bg-lime text-ground border-none font-display font-extrabold text-[11.5px] tracking-[0.12em] uppercase py-3.25 px-4.5 cursor-pointer transition-colors"
+                whileHover={{ backgroundColor: "#C8F32B" }}
+                whileTap={{ scale: 0.94 }}
+                transition={{ duration: 0.18, ease: "easeOut" }}
+                className="mt-1 bg-white text-ground border-none font-display font-extrabold text-[11.5px] tracking-[0.12em] uppercase py-3.25 px-4.5 cursor-pointer overflow-hidden"
               >
-                {copied ? "Copied" : "Copy tracking number"}
-              </button>
-            </div>
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.span
+                    key={copied ? "copied" : "copy"}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.18, ease: "easeOut" }}
+                    className="inline-block"
+                  >
+                    {copied ? "Copied" : "Copy tracking number"}
+                  </motion.span>
+                </AnimatePresence>
+              </motion.button>
+            </Reveal>
 
-            <div className="bg-ground-alt border border-white/9 p-5.5 flex flex-col gap-2.5">
+            <Reveal delay={0.1} className="bg-ground-alt border border-white/9 p-5.5 flex flex-col gap-2.5">
               <p className="m-0 font-display font-extrabold text-xs tracking-[0.16em] uppercase text-white">
                 Delivering to
               </p>
@@ -315,9 +342,9 @@ export default function OrderTrackingPage() {
                 <br />
                 France
               </p>
-            </div>
+            </Reveal>
 
-            <div className="bg-lime text-ground px-5.5 py-6 flex flex-col gap-3">
+            <Reveal delay={0.2} className="bg-lime text-ground px-5.5 py-6 flex flex-col gap-3">
               <h2 className="m-0 font-display italic font-black text-[22px] leading-none uppercase">
                 Something off?
               </h2>
@@ -327,7 +354,7 @@ export default function OrderTrackingPage() {
               <CtaLink href="/contact" variant="dark" className="self-start mt-1">
                 Contact support
               </CtaLink>
-            </div>
+            </Reveal>
           </div>
         </section>
       )}

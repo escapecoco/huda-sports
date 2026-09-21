@@ -2,9 +2,23 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { AnimatePresence, motion } from "motion/react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { CtaLink } from "@/components/Button";
+import { Reveal } from "@/components/motion/Reveal";
+import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
+
+const EASE = [0.16, 1, 0.3, 1] as const;
+
+const heroContainer = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.09, delayChildren: 0.08 } },
+};
+const heroItem = {
+  hidden: { opacity: 0, y: 18 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: EASE } },
+};
 
 const SWASH_CLIP =
   "polygon(0% 74%, 4% 40%, 18% 20%, 48% 8%, 78% 4%, 96% 10%, 100% 34%, 97% 62%, 80% 82%, 50% 92%, 22% 98%, 6% 96%)";
@@ -88,79 +102,100 @@ export default function LegalPage() {
       <Header />
 
       <section className="bg-ground-alt border-b border-hairline">
-        <div className="max-w-[1240px] mx-auto px-6 pt-11.5 pb-10 flex items-end justify-between gap-6.5 flex-wrap">
+        <motion.div
+          className="max-w-[1240px] mx-auto px-6 pt-11.5 pb-10 flex items-end justify-between gap-6.5 flex-wrap"
+          initial="hidden"
+          animate="show"
+          variants={heroContainer}
+        >
           <div className="flex flex-col gap-3.5 max-w-[46ch]">
-            <p className="m-0 text-[11.5px] tracking-[0.3em] uppercase text-[#BFBFBF]">
+            <motion.p variants={heroItem} className="m-0 text-[11.5px] tracking-[0.3em] uppercase text-[#BFBFBF]">
               <Link href="/" className="text-[#BFBFBF] hover:text-lime transition-colors">
                 Home
               </Link>{" "}
               / Legal
-            </p>
-            <h1 className="m-0 font-display italic font-black [font-stretch:84%] text-[clamp(30px,4.6vw,52px)] leading-[0.92] tracking-[-0.02em] uppercase text-white">
+            </motion.p>
+            <motion.h1
+              variants={heroItem}
+              className="m-0 font-display italic font-black [font-stretch:84%] text-[clamp(30px,4.6vw,52px)] leading-[0.92] tracking-[-0.02em] uppercase text-white"
+            >
               Privacy &amp; terms
-            </h1>
-            <span className="block w-40 h-3 bg-lime" style={{ clipPath: SWASH_CLIP }} />
-            <p className="m-0 text-[14.5px] leading-[1.7] text-ink-secondary">
+            </motion.h1>
+            <motion.span variants={heroItem} className="block w-40 h-3 bg-lime" style={{ clipPath: SWASH_CLIP }} />
+            <motion.p variants={heroItem} className="m-0 text-[14.5px] leading-[1.7] text-ink-secondary">
               Plain-language version of how we handle your data and what you agree to when you order.
               Last updated March 2024.
-            </p>
+            </motion.p>
           </div>
-          <div className="flex gap-2 flex-wrap">
+          <motion.div variants={heroItem} className="flex gap-2 flex-wrap">
             {(["Privacy", "Terms"] as Tab[]).map((t) => {
               const active = tab === t;
               return (
-                <button
+                <motion.button
                   key={t}
                   onClick={() => setTab(t)}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ duration: 0.15 }}
                   className={`font-display font-extrabold text-[11.5px] tracking-[0.14em] uppercase px-4.5 py-2.75 cursor-pointer border transition-colors ${
                     active ? "border-lime bg-lime text-ground" : "border-white/16 bg-transparent text-[#BDBDBD]"
                   }`}
                 >
                   {t === "Privacy" ? "Privacy policy" : "Terms of service"}
-                </button>
+                </motion.button>
               );
             })}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </section>
 
       <section className="max-w-[1240px] mx-auto px-6 pt-9 pb-15.5 grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-8.5 items-start">
-        <div className="flex flex-col gap-6.5 order-2">
-          {sections.map((s, i) => (
-            <div key={s.title} className="flex flex-col gap-2.5">
-              <p className="m-0 font-display font-extrabold text-[12.5px] tracking-[0.14em] uppercase text-lime">
-                {String(i + 1).padStart(2, "0")}
-              </p>
-              <h2 className="m-0 font-display font-extrabold text-[clamp(19px,2.2vw,24px)] leading-[1.15] text-white">
-                {s.title}
-              </h2>
-              <p className="m-0 text-[14.5px] leading-[1.78] text-[#B4B4B4] max-w-[66ch]">{s.body}</p>
-              {s.bullets && (
-                <div className="flex flex-col gap-2 mt-0.5">
-                  {s.bullets.map((b) => (
-                    <div key={b} className="grid grid-cols-[10px_minmax(0,1fr)] gap-3 items-start">
-                      <span className="w-[7px] h-[7px] bg-lime block mt-2" />
-                      <p className="m-0 text-sm leading-[1.7] text-[#A8A8A8] max-w-[62ch]">{b}</p>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={tab}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.35, ease: EASE }}
+            className="flex flex-col gap-6.5 order-2"
+          >
+            <StaggerGroup className="flex flex-col gap-6.5">
+              {sections.map((s, i) => (
+                <StaggerItem key={s.title} className="flex flex-col gap-2.5">
+                  <p className="m-0 font-display font-extrabold text-[12.5px] tracking-[0.14em] uppercase text-lime">
+                    {String(i + 1).padStart(2, "0")}
+                  </p>
+                  <h2 className="m-0 font-display font-extrabold text-[clamp(19px,2.2vw,24px)] leading-[1.15] text-white">
+                    {s.title}
+                  </h2>
+                  <p className="m-0 text-[14.5px] leading-[1.78] text-[#B4B4B4] max-w-[66ch]">{s.body}</p>
+                  {s.bullets && (
+                    <div className="flex flex-col gap-2 mt-0.5">
+                      {s.bullets.map((b) => (
+                        <div key={b} className="grid grid-cols-[10px_minmax(0,1fr)] gap-3 items-start">
+                          <span className="w-[7px] h-[7px] bg-lime block mt-2" />
+                          <p className="m-0 text-sm leading-[1.7] text-[#A8A8A8] max-w-[62ch]">{b}</p>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
+                  )}
+                </StaggerItem>
+              ))}
+            </StaggerGroup>
 
-          <div className="bg-card border border-white/8 px-5.5 py-6 flex flex-col gap-2.5">
-            <p className="m-0 font-display font-extrabold text-xs tracking-[0.16em] uppercase text-white">
-              Questions about your data?
-            </p>
-            <p className="m-0 text-sm leading-[1.7] text-[#A8A8A8] max-w-[52ch]">
-              Write to privacy@hudasports.com and we answer within 30 days, as required by GDPR. You can
-              ask for a copy or deletion of everything we hold.
-            </p>
-            <CtaLink href="/contact" className="self-start mt-1.5">
-              Contact us
-            </CtaLink>
-          </div>
-        </div>
+            <Reveal className="bg-card border border-white/8 px-5.5 py-6 flex flex-col gap-2.5">
+              <p className="m-0 font-display font-extrabold text-xs tracking-[0.16em] uppercase text-white">
+                Questions about your data?
+              </p>
+              <p className="m-0 text-sm leading-[1.7] text-[#A8A8A8] max-w-[52ch]">
+                Write to privacy@hudasports.com and we answer within 30 days, as required by GDPR. You can
+                ask for a copy or deletion of everything we hold.
+              </p>
+              <CtaLink href="/contact" className="self-start mt-1.5">
+                Contact us
+              </CtaLink>
+            </Reveal>
+          </motion.div>
+        </AnimatePresence>
 
         <aside className="order-1 bg-ground-alt border border-white/9 p-5.5 flex flex-col gap-3 sticky top-[90px]">
           <p className="m-0 font-display font-extrabold text-xs tracking-[0.16em] uppercase text-white">

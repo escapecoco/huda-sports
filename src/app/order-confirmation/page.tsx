@@ -4,9 +4,14 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "motion/react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { formatDayOffset, loadOrder, money, type StoredOrder } from "@/lib/orders";
+import { Reveal } from "@/components/motion/Reveal";
+import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
+
+const EASE = [0.16, 1, 0.3, 1] as const;
 
 type TimelineState = "done" | "active" | "next";
 
@@ -60,24 +65,49 @@ export default function OrderConfirmationPage() {
         <div className="absolute inset-0 bg-[linear-gradient(96deg,#0A0A0A_0%,rgba(10,10,10,0.9)_32%,rgba(10,10,10,0.5)_62%,rgba(6,6,6,0.75)_100%)]" />
         <div className="relative z-10 max-w-[1240px] mx-auto px-6 pt-14 pb-13 flex items-end justify-between gap-7.5 flex-wrap">
           <div className="flex flex-col gap-4 max-w-[46ch]">
-            <p className="m-0 text-[11.5px] tracking-[0.3em] uppercase text-lime">Order confirmed</p>
-            <h1 className="m-0 font-display italic font-black [font-stretch:84%] text-[clamp(34px,5.4vw,62px)] leading-[0.9] tracking-[-0.02em] uppercase text-white">
+            <motion.p
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0, ease: EASE }}
+              className="m-0 text-[11.5px] tracking-[0.3em] uppercase text-lime"
+            >
+              Order confirmed
+            </motion.p>
+            <motion.h1
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55, delay: 0.08, ease: EASE }}
+              className="m-0 font-display italic font-black [font-stretch:84%] text-[clamp(34px,5.4vw,62px)] leading-[0.9] tracking-[-0.02em] uppercase text-white"
+            >
               You&apos;re in
               <br />
               the squad
-            </h1>
-            <span
+            </motion.h1>
+            <motion.span
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.16, ease: EASE }}
               className="w-[190px] h-3 bg-lime"
               style={{
                 clipPath:
                   "polygon(0% 74%, 4% 40%, 18% 20%, 48% 8%, 78% 4%, 96% 10%, 100% 34%, 97% 62%, 80% 82%, 50% 92%, 22% 98%, 6% 96%)",
               }}
             />
-            <p className="m-0 text-[15px] leading-[1.7] text-[#CFCFCF]">
+            <motion.p
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.22, ease: EASE }}
+              className="m-0 text-[15px] leading-[1.7] text-[#CFCFCF]"
+            >
               Thanks {order.shippingAddress.first || "there"} — your order is paid and being picked. A
               confirmation is on its way to {order.email}.
-            </p>
-            <div className="flex gap-3.5 flex-wrap mt-1.5">
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.28, ease: EASE }}
+              className="flex gap-3.5 flex-wrap mt-1.5"
+            >
               <Link
                 href="/order-tracking"
                 className="bg-lime text-ground font-display font-extrabold text-[13px] tracking-[0.1em] uppercase px-6 py-3.5 inline-flex items-center gap-2.5 hover:bg-lime-hover transition-colors"
@@ -90,9 +120,14 @@ export default function OrderConfirmationPage() {
               >
                 Continue shopping <span className="text-[15px]">→</span>
               </Link>
-            </div>
+            </motion.div>
           </div>
-          <div className="flex flex-col gap-3.5 bg-[rgba(6,6,6,0.72)] border border-white/14 px-6 py-5.5 min-w-[240px]">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55, delay: 0.34, ease: EASE }}
+            className="flex flex-col gap-3.5 bg-[rgba(6,6,6,0.72)] border border-white/14 px-6 py-5.5 min-w-[240px]"
+          >
             <div className="flex flex-col gap-1">
               <p className="m-0 text-[11px] tracking-[0.16em] uppercase text-[#8C8C8C]">Order number</p>
               <p className="m-0 font-display font-black text-[22px] text-white">{order.orderNumber}</p>
@@ -105,16 +140,16 @@ export default function OrderConfirmationPage() {
               <p className="m-0 text-[11px] tracking-[0.16em] uppercase text-[#8C8C8C]">Total paid</p>
               <p className="m-0 font-display font-black text-[22px] text-lime">{money(order.total)}</p>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       <section className="max-w-[1240px] mx-auto px-6 pt-9 pb-5">
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(190px,1fr))] gap-3.5">
+        <StaggerGroup className="grid grid-cols-[repeat(auto-fit,minmax(190px,1fr))] gap-3.5">
           {timeline.map((t) => {
             const on = t.state !== "next";
             return (
-              <div
+              <StaggerItem
                 key={t.label}
                 className={`flex flex-col gap-2 px-4 py-4.5 border ${
                   t.state === "active" ? "border-lime bg-lime/8" : "border-white/10 bg-card"
@@ -129,14 +164,14 @@ export default function OrderConfirmationPage() {
                   {t.label}
                 </p>
                 <p className="m-0 text-[12.5px] opacity-72">{t.date}</p>
-              </div>
+              </StaggerItem>
             );
           })}
-        </div>
+        </StaggerGroup>
       </section>
 
       <section className="max-w-[1240px] mx-auto px-6 pt-5.5 pb-15 grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-8.5 items-start">
-        <div className="flex flex-col gap-3.5">
+        <Reveal className="flex flex-col gap-3.5">
           <p className="m-0 font-display font-extrabold text-xs tracking-[0.16em] uppercase text-white">
             What you ordered ({itemCount})
           </p>
@@ -168,10 +203,10 @@ export default function OrderConfirmationPage() {
               </p>
             </article>
           ))}
-        </div>
+        </Reveal>
 
         <div className="flex flex-col gap-3.5">
-          <div className="bg-ground-alt border border-white/9 px-5.5 pt-5.5 pb-6 flex flex-col gap-3">
+          <Reveal className="bg-ground-alt border border-white/9 px-5.5 pt-5.5 pb-6 flex flex-col gap-3">
             <p className="m-0 font-display font-extrabold text-xs tracking-[0.16em] uppercase text-white">
               Summary
             </p>
@@ -197,9 +232,9 @@ export default function OrderConfirmationPage() {
               </p>
               <p className="m-0 font-display font-black text-2xl text-white">{money(order.total)}</p>
             </div>
-          </div>
+          </Reveal>
 
-          <div className="bg-ground-alt border border-white/9 px-5.5 py-5.5 flex flex-col gap-2.5">
+          <Reveal delay={0.1} className="bg-ground-alt border border-white/9 px-5.5 py-5.5 flex flex-col gap-2.5">
             <p className="m-0 font-display font-extrabold text-xs tracking-[0.16em] uppercase text-white">
               Shipping to
             </p>
@@ -219,9 +254,9 @@ export default function OrderConfirmationPage() {
               </Link>{" "}
               within 2 hours and we&apos;ll fix it.
             </p>
-          </div>
+          </Reveal>
 
-          <div className="bg-lime text-ground px-5.5 py-6 flex flex-col gap-3">
+          <Reveal delay={0.2} className="bg-lime text-ground px-5.5 py-6 flex flex-col gap-3">
             <p className="m-0 font-display italic font-black text-[22px] leading-none uppercase">
               Tag us when it lands
             </p>
@@ -234,7 +269,7 @@ export default function OrderConfirmationPage() {
             >
               Follow the crew <span className="text-sm">→</span>
             </Link>
-          </div>
+          </Reveal>
         </div>
       </section>
 

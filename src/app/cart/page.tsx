@@ -2,10 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { motion } from "motion/react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useCart } from "@/lib/cart-context";
 import { money, savePromo } from "@/lib/orders";
+import { Reveal } from "@/components/motion/Reveal";
+import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 
 const FREE_SHIPPING_THRESHOLD = 80;
 const STANDARD_SHIPPING = 6.9;
@@ -52,7 +55,7 @@ export default function CartPage() {
     <div className="font-body w-full">
       <Header />
 
-      <div className="max-w-[1240px] mx-auto px-6 pt-6.5 pb-0">
+      <Reveal className="max-w-[1240px] mx-auto px-6 pt-6.5 pb-0">
         <p className="m-0 mb-4 text-[11.5px] tracking-[0.24em] uppercase text-[#8C8C8C]">
           <Link href="/" className="text-[#8C8C8C] hover:text-lime transition-colors">
             Home
@@ -74,79 +77,84 @@ export default function CartPage() {
             {count} items · {freeShipNote}
           </p>
         </div>
-      </div>
+      </Reveal>
 
       <section className="max-w-[1240px] mx-auto px-6 pt-6.5 pb-16 grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-8.5 items-start">
         <div className="flex flex-col gap-3.5">
+        <StaggerGroup className="flex flex-col gap-3.5">
           {items.map((item) => {
             const lineTotal = item.price * item.qty;
             return (
-              <article
-                key={`${item.slug}__${item.size}__${item.color}`}
-                className="grid grid-cols-[104px_minmax(0,1fr)] gap-4 bg-card border border-hairline p-3.5"
-              >
-                <div className="relative aspect-4/5 bg-[#121212] overflow-hidden">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,#232323_0%,#141414_68%,#0B0B0B_100%)]" />
-                  <div
-                    className="absolute inset-0 bg-cover [filter:contrast(1.06)_saturate(1.04)_brightness(1.02)]"
-                    style={{ backgroundImage: `url(${item.image})`, backgroundPosition: item.focus }}
-                  />
-                </div>
-                <div className="flex flex-col gap-2.5 min-w-0">
-                  <div className="flex items-start justify-between gap-3.5">
-                    <div className="flex flex-col gap-[5px] min-w-0">
-                      <Link
-                        href={`/shop/${item.slug}`}
-                        className="text-[15px] font-semibold text-[#F0F0F0] hover:text-lime transition-colors truncate"
-                      >
-                        {item.name}
-                      </Link>
-                      <p className="m-0 text-[11.5px] tracking-[0.12em] uppercase text-[#8C8C8C]">
-                        {item.color} · {item.size}
+              <StaggerItem key={`${item.slug}__${item.size}__${item.color}`}>
+                <article className="grid grid-cols-[104px_minmax(0,1fr)] gap-4 bg-card border border-hairline p-3.5">
+                  <div className="relative aspect-4/5 bg-[#121212] overflow-hidden">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,#232323_0%,#141414_68%,#0B0B0B_100%)]" />
+                    <div
+                      className="absolute inset-0 bg-cover [filter:contrast(1.06)_saturate(1.04)_brightness(1.02)]"
+                      style={{ backgroundImage: `url(${item.image})`, backgroundPosition: item.focus }}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2.5 min-w-0">
+                    <div className="flex items-start justify-between gap-3.5">
+                      <div className="flex flex-col gap-[5px] min-w-0">
+                        <Link
+                          href={`/shop/${item.slug}`}
+                          className="text-[15px] font-semibold text-[#F0F0F0] hover:text-lime transition-colors truncate"
+                        >
+                          {item.name}
+                        </Link>
+                        <p className="m-0 text-[11.5px] tracking-[0.12em] uppercase text-[#8C8C8C]">
+                          {item.color} · {item.size}
+                        </p>
+                      </div>
+                      <p className="m-0 font-display font-extrabold text-[16px] text-white whitespace-nowrap">
+                        {money(lineTotal)}
                       </p>
                     </div>
-                    <p className="m-0 font-display font-extrabold text-[16px] text-white whitespace-nowrap">
-                      {money(lineTotal)}
-                    </p>
-                  </div>
-                  <div className="flex items-center justify-between gap-3.5 flex-wrap mt-auto">
-                    <div className="flex items-center border border-white/16 bg-[#101010]">
-                      <button
-                        onClick={() =>
-                          setQty(item.slug, item.size, item.color, Math.max(1, item.qty - 1))
-                        }
-                        className="w-9 h-10 bg-transparent border-none text-white text-base cursor-pointer"
-                        aria-label={`Decrease quantity of ${item.name}`}
+                    <div className="flex items-center justify-between gap-3.5 flex-wrap mt-auto">
+                      <div className="flex items-center border border-white/16 bg-[#101010]">
+                        <motion.button
+                          onClick={() =>
+                            setQty(item.slug, item.size, item.color, Math.max(1, item.qty - 1))
+                          }
+                          whileTap={{ scale: 0.9 }}
+                          className="w-9 h-10 bg-transparent border-none text-white text-base cursor-pointer"
+                          aria-label={`Decrease quantity of ${item.name}`}
+                        >
+                          −
+                        </motion.button>
+                        <span className="min-w-[30px] text-center font-display font-extrabold text-sm text-white">
+                          {item.qty}
+                        </span>
+                        <motion.button
+                          onClick={() =>
+                            setQty(item.slug, item.size, item.color, Math.min(9, item.qty + 1))
+                          }
+                          whileTap={{ scale: 0.9 }}
+                          className="w-9 h-10 bg-transparent border-none text-white text-base cursor-pointer"
+                          aria-label={`Increase quantity of ${item.name}`}
+                        >
+                          +
+                        </motion.button>
+                      </div>
+                      <motion.button
+                        onClick={() => removeItem(item.slug, item.size, item.color)}
+                        whileTap={{ scale: 0.9 }}
+                        className="bg-transparent border-none p-0 cursor-pointer font-display font-extrabold text-[11px] tracking-[0.14em] uppercase text-[#8C8C8C] border-b border-white/20 hover:text-lime hover:border-lime transition-colors"
                       >
-                        −
-                      </button>
-                      <span className="min-w-[30px] text-center font-display font-extrabold text-sm text-white">
-                        {item.qty}
-                      </span>
-                      <button
-                        onClick={() =>
-                          setQty(item.slug, item.size, item.color, Math.min(9, item.qty + 1))
-                        }
-                        className="w-9 h-10 bg-transparent border-none text-white text-base cursor-pointer"
-                        aria-label={`Increase quantity of ${item.name}`}
-                      >
-                        +
-                      </button>
+                        Remove
+                      </motion.button>
                     </div>
-                    <button
-                      onClick={() => removeItem(item.slug, item.size, item.color)}
-                      className="bg-transparent border-none p-0 cursor-pointer font-display font-extrabold text-[11px] tracking-[0.14em] uppercase text-[#8C8C8C] border-b border-white/20 hover:text-lime hover:border-lime transition-colors"
-                    >
-                      Remove
-                    </button>
                   </div>
-                </div>
-              </article>
+                </article>
+              </StaggerItem>
             );
           })}
+        </StaggerGroup>
 
+        <div className="flex flex-col gap-3.5">
           {isEmpty && (
-            <div className="border border-hairline bg-card px-7 py-11.5 flex flex-col items-start gap-4">
+            <Reveal className="border border-hairline bg-card px-7 py-11.5 flex flex-col items-start gap-4">
               <p className="m-0 font-display italic font-black text-[26px] uppercase text-white">
                 Your bag is empty
               </p>
@@ -159,7 +167,7 @@ export default function CartPage() {
               >
                 Shop the collection <span className="text-sm">→</span>
               </Link>
-            </div>
+            </Reveal>
           )}
 
           <Link
@@ -169,8 +177,9 @@ export default function CartPage() {
             ← Continue shopping
           </Link>
         </div>
+        </div>
 
-        <aside className="bg-ground-alt border border-white/9 px-6 pt-6.5 pb-7 flex flex-col gap-4.5 sticky top-[90px]">
+        <Reveal delay={0.12} className="bg-ground-alt border border-white/9 px-6 pt-6.5 pb-7 flex flex-col gap-4.5 sticky top-[90px]">
           <p className="m-0 font-display font-extrabold text-xs tracking-[0.16em] uppercase text-white">
             Order summary
           </p>
@@ -178,9 +187,10 @@ export default function CartPage() {
           {!isEmpty && (
             <div className="flex flex-col gap-1.5">
               <div className="h-[5px] bg-white/10 overflow-hidden">
-                <div
-                  className="h-full bg-lime transition-[width]"
-                  style={{ width: `${progressPct}%` }}
+                <motion.div
+                  className="h-full bg-lime"
+                  animate={{ width: `${progressPct}%` }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
                 />
               </div>
               <p className="m-0 text-[11.5px] text-[#9E9E9E]">
@@ -250,7 +260,7 @@ export default function CartPage() {
           <p className="m-0 text-xs leading-[1.6] text-[#8C8C8C]">
             Taxes calculated at checkout. Free shipping over $80 · 30-day returns.
           </p>
-        </aside>
+        </Reveal>
       </section>
 
       <Footer />

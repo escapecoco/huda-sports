@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { motion } from "motion/react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useCart } from "@/lib/cart-context";
@@ -13,6 +14,8 @@ import {
   money,
   saveOrder,
 } from "@/lib/orders";
+import { Reveal } from "@/components/motion/Reveal";
+import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 
 const FREE_SHIPPING_THRESHOLD = 80;
 const PROMO_RATE = 0.1;
@@ -155,7 +158,7 @@ export default function CheckoutPage() {
 
       <section className="max-w-[1240px] mx-auto px-6 pt-6.5 pb-16 grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-8.5 items-start">
         <div className="flex flex-col gap-6.5">
-          <div className="flex flex-col gap-3.5">
+          <Reveal className="flex flex-col gap-3.5">
             <p className="m-0 font-display font-extrabold text-xs tracking-[0.16em] uppercase text-white">
               1 · Contact
             </p>
@@ -173,9 +176,9 @@ export default function CheckoutPage() {
               onChange={(e) => setPhone(e.target.value)}
               className="bg-input border border-white/16 text-white text-sm px-3.5 py-3.5 outline-none focus:border-lime placeholder:text-[#6E6E6E]"
             />
-          </div>
+          </Reveal>
 
-          <div className="flex flex-col gap-3.5">
+          <Reveal delay={0.08} className="flex flex-col gap-3.5">
             <p className="m-0 font-display font-extrabold text-xs tracking-[0.16em] uppercase text-white">
               2 · Shipping address
             </p>
@@ -229,37 +232,41 @@ export default function CheckoutPage() {
                 ))}
               </select>
             </div>
-          </div>
+          </Reveal>
 
-          <div className="flex flex-col gap-3">
+          <Reveal delay={0.16} className="flex flex-col gap-3">
             <p className="m-0 font-display font-extrabold text-xs tracking-[0.16em] uppercase text-white">
               3 · Delivery
             </p>
-            {methods.map((m, i) => {
-              const active = methodIndex === i;
-              return (
-                <button
-                  key={m.key}
-                  onClick={() => setMethodIndex(i)}
-                  className={`flex items-center justify-between gap-4 w-full px-4 py-3.5 cursor-pointer text-left border text-white transition-colors ${
-                    active ? "border-lime bg-lime/8" : "border-white/16 bg-[#101010]"
-                  }`}
-                >
-                  <span className="flex flex-col gap-1 text-left">
-                    <span className="font-display font-extrabold text-[12.5px] tracking-[0.1em] uppercase">
-                      {m.label}
-                    </span>
-                    <span className="font-body font-medium text-[13px] opacity-75">{m.eta}</span>
-                  </span>
-                  <span className="font-display font-extrabold text-sm">
-                    {m.price === 0 ? "Free" : money(m.price)}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+            <StaggerGroup className="flex flex-col gap-3">
+              {methods.map((m, i) => {
+                const active = methodIndex === i;
+                return (
+                  <StaggerItem key={m.key}>
+                    <motion.button
+                      onClick={() => setMethodIndex(i)}
+                      whileTap={{ scale: 0.98 }}
+                      className={`flex items-center justify-between gap-4 w-full px-4 py-3.5 cursor-pointer text-left border text-white transition-colors ${
+                        active ? "border-lime bg-lime/8" : "border-white/16 bg-[#101010]"
+                      }`}
+                    >
+                      <span className="flex flex-col gap-1 text-left">
+                        <span className="font-display font-extrabold text-[12.5px] tracking-[0.1em] uppercase">
+                          {m.label}
+                        </span>
+                        <span className="font-body font-medium text-[13px] opacity-75">{m.eta}</span>
+                      </span>
+                      <span className="font-display font-extrabold text-sm">
+                        {m.price === 0 ? "Free" : money(m.price)}
+                      </span>
+                    </motion.button>
+                  </StaggerItem>
+                );
+              })}
+            </StaggerGroup>
+          </Reveal>
 
-          <div className="flex flex-col gap-3">
+          <Reveal delay={0.24} className="flex flex-col gap-3">
             <p className="m-0 font-display font-extrabold text-xs tracking-[0.16em] uppercase text-white">
               4 · Payment
             </p>
@@ -316,15 +323,18 @@ export default function CheckoutPage() {
                 You&apos;ll confirm the payment in your wallet app after placing the order.
               </p>
             )}
-          </div>
+          </Reveal>
 
           <div className="flex flex-col gap-3 pt-1.5">
-            <button
+            <motion.button
               onClick={placeOrder}
-              className="bg-lime text-ground border-none font-display font-extrabold text-[13px] tracking-[0.1em] uppercase px-5.5 py-4.5 cursor-pointer flex items-center justify-center gap-2.5 hover:bg-lime-hover transition-colors"
+              whileHover={{ backgroundColor: "#E4FF7A" }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ duration: 0.18, ease: "easeOut" }}
+              className="bg-lime text-ground border-none font-display font-extrabold text-[13px] tracking-[0.1em] uppercase px-5.5 py-4.5 cursor-pointer flex items-center justify-center gap-2.5"
             >
               Place order · {money(total)} <span className="text-[15px]">→</span>
-            </button>
+            </motion.button>
             <p className="m-0 text-[12.5px] text-[#FF8A8A] min-h-[18px]">{error}</p>
             <p className="m-0 text-xs leading-[1.6] text-[#8C8C8C]">
               By placing this order you accept our terms of service and return policy. Payments are
@@ -333,7 +343,7 @@ export default function CheckoutPage() {
           </div>
         </div>
 
-        <aside className="bg-ground-alt border border-white/9 px-5.5 pt-6 pb-6.5 flex flex-col gap-4 sticky top-[90px]">
+        <Reveal delay={0.15} className="bg-ground-alt border border-white/9 px-5.5 pt-6 pb-6.5 flex flex-col gap-4 sticky top-[90px]">
           <p className="m-0 font-display font-extrabold text-xs tracking-[0.16em] uppercase text-white">
             Your order · {items.reduce((t, i) => t + i.qty, 0)} items
           </p>
@@ -411,7 +421,7 @@ export default function CheckoutPage() {
             </Link>{" "}
             instead of checking out.
           </p>
-        </aside>
+        </Reveal>
       </section>
 
       <Footer />

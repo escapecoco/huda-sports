@@ -3,10 +3,23 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { AnimatePresence, motion } from "motion/react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { MarkerNote } from "@/components/MarkerNote";
 import { CtaButton, CtaLink } from "@/components/Button";
+import { Reveal } from "@/components/motion/Reveal";
+
+const EASE = [0.16, 1, 0.3, 1] as const;
+
+const heroContainer = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.09, delayChildren: 0.08 } },
+};
+const heroItem = {
+  hidden: { opacity: 0, y: 18 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: EASE } },
+};
 
 const SWASH_CLIP =
   "polygon(0% 74%, 4% 40%, 18% 20%, 48% 8%, 78% 4%, 96% 10%, 100% 34%, 97% 62%, 80% 82%, 50% 92%, 22% 98%, 6% 96%)";
@@ -48,40 +61,50 @@ export default function ContactPage() {
           className="object-cover [object-position:center_42%] [filter:contrast(1.05)_brightness(0.55)]"
         />
         <div className="absolute inset-0 bg-[linear-gradient(96deg,#0A0A0A_0%,rgba(10,10,10,0.9)_32%,rgba(10,10,10,0.5)_66%,rgba(6,6,6,0.78)_100%)]" />
-        <div className="relative z-[2] max-w-[1240px] mx-auto px-6 pt-13 pb-12 flex items-end justify-between gap-7.5 flex-wrap">
+        <motion.div
+          className="relative z-[2] max-w-[1240px] mx-auto px-6 pt-13 pb-12 flex items-end justify-between gap-7.5 flex-wrap"
+          initial="hidden"
+          animate="show"
+          variants={heroContainer}
+        >
           <div className="flex flex-col gap-3.5 max-w-[44ch]">
-            <p className="m-0 text-[11.5px] tracking-[0.3em] uppercase text-[#BFBFBF]">
+            <motion.p variants={heroItem} className="m-0 text-[11.5px] tracking-[0.3em] uppercase text-[#BFBFBF]">
               <Link href="/" className="hover:text-lime transition-colors">
                 Home
               </Link>{" "}
               / Contact
-            </p>
-            <h1 className="m-0 font-display italic font-black [font-stretch:84%] text-[clamp(32px,5vw,58px)] leading-[0.9] tracking-[-0.02em] uppercase text-white">
+            </motion.p>
+            <motion.h1
+              variants={heroItem}
+              className="m-0 font-display italic font-black [font-stretch:84%] text-[clamp(32px,5vw,58px)] leading-[0.9] tracking-[-0.02em] uppercase text-white"
+            >
               Talk
               <br />
               to us
-            </h1>
-            <span className="block w-[170px] h-3 bg-lime" style={{ clipPath: SWASH_CLIP }} />
-            <p className="m-0 text-[15px] leading-[1.7] text-[#C4C4C4]">
+            </motion.h1>
+            <motion.span variants={heroItem} className="block w-[170px] h-3 bg-lime" style={{ clipPath: SWASH_CLIP }} />
+            <motion.p variants={heroItem} className="m-0 text-[15px] leading-[1.7] text-[#C4C4C4]">
               Orders, sizing, team kit or collabs — one message and a real person answers within 24
               hours.
-            </p>
+            </motion.p>
           </div>
           <MarkerNote lines={["Same", "team", "one", "call"]} rotate={-9} />
-        </div>
+        </motion.div>
       </section>
 
       {/* Form + info */}
       <section className="max-w-[1240px] mx-auto px-6 pt-10 pb-15 grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-8.5 items-start">
-        <div className="flex flex-col gap-4">
+        <Reveal className="flex flex-col gap-4">
           <p className="m-0 font-display font-extrabold text-[12px] tracking-[0.16em] uppercase text-white">
             Send a message
           </p>
           <div className="flex gap-2 flex-wrap">
             {topics.map((t) => (
-              <button
+              <motion.button
                 key={t}
                 onClick={() => setTopic(t)}
+                whileTap={{ scale: 0.95 }}
+                transition={{ duration: 0.15 }}
                 className={`font-display font-extrabold text-[11px] tracking-[0.14em] uppercase px-3.5 py-2.5 cursor-pointer border transition-colors ${
                   topic === t
                     ? "border-lime bg-lime text-ground"
@@ -89,7 +112,7 @@ export default function ContactPage() {
                 }`}
               >
                 {t}
-              </button>
+              </motion.button>
             ))}
           </div>
           <div className="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3">
@@ -125,11 +148,26 @@ export default function ContactPage() {
           <CtaButton onClick={send} className="self-start">
             Send message
           </CtaButton>
-          <p className={`m-0 text-[13px] min-h-[19px] ${ok ? "text-lime" : "text-[#FF8A8A]"}`}>{note}</p>
-        </div>
+          <div className="min-h-[19px]">
+            <AnimatePresence mode="wait">
+              {note && (
+                <motion.p
+                  key={note}
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.25, ease: EASE }}
+                  className={`m-0 text-[13px] ${ok ? "text-lime" : "text-[#FF8A8A]"}`}
+                >
+                  {note}
+                </motion.p>
+              )}
+            </AnimatePresence>
+          </div>
+        </Reveal>
 
         <div className="flex flex-col gap-3.5">
-          <div className="bg-ground-alt border border-hairline p-5.5 flex flex-col gap-3.5">
+          <Reveal className="bg-ground-alt border border-hairline p-5.5 flex flex-col gap-3.5">
             <p className="m-0 font-display font-extrabold text-[12px] tracking-[0.16em] uppercase text-white">
               Direct lines
             </p>
@@ -151,9 +189,9 @@ export default function ContactPage() {
                 press@hudasports.com
               </a>
             </div>
-          </div>
+          </Reveal>
 
-          <div className="bg-ground-alt border border-hairline p-5.5 flex flex-col gap-2.5">
+          <Reveal delay={0.1} className="bg-ground-alt border border-hairline p-5.5 flex flex-col gap-2.5">
             <p className="m-0 font-display font-extrabold text-[12px] tracking-[0.16em] uppercase text-white">
               Response times
             </p>
@@ -172,9 +210,9 @@ export default function ContactPage() {
               </Link>{" "}
               first — it&#8217;s usually faster.
             </p>
-          </div>
+          </Reveal>
 
-          <div className="bg-lime text-ground px-5.5 py-6 flex flex-col gap-3">
+          <Reveal delay={0.2} className="bg-lime text-ground px-5.5 py-6 flex flex-col gap-3">
             <h2 className="m-0 font-display italic font-black text-[22px] leading-none uppercase">
               Kitting out a team?
             </h2>
@@ -184,7 +222,7 @@ export default function ContactPage() {
             <CtaLink href="/team-orders" variant="dark" className="self-start mt-1">
               Request a quote
             </CtaLink>
-          </div>
+          </Reveal>
         </div>
       </section>
 

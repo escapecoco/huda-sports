@@ -3,10 +3,24 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "motion/react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { MarkerNote } from "@/components/MarkerNote";
 import { CtaLink } from "@/components/Button";
+import { Reveal } from "@/components/motion/Reveal";
+import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
+
+const EASE = [0.16, 1, 0.3, 1] as const;
+
+const heroContainer = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.09, delayChildren: 0.08 } },
+};
+const heroItem = {
+  hidden: { opacity: 0, y: 18 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: EASE } },
+};
 
 const SWASH_CLIP =
   "polygon(0% 74%, 4% 40%, 18% 20%, 48% 8%, 78% 4%, 96% 10%, 100% 34%, 97% 62%, 80% 82%, 50% 92%, 22% 98%, 6% 96%)";
@@ -84,44 +98,54 @@ export default function SizeGuidePage() {
           className="object-cover [object-position:center_30%] [filter:contrast(1.05)_brightness(0.55)]"
         />
         <div className="absolute inset-0 bg-[linear-gradient(96deg,#0A0A0A_0%,rgba(10,10,10,0.9)_32%,rgba(10,10,10,0.5)_66%,rgba(6,6,6,0.78)_100%)]" />
-        <div className="relative z-2 max-w-[1240px] mx-auto px-6 pt-13 pb-12 flex items-end justify-between gap-7.5 flex-wrap">
+        <motion.div
+          className="relative z-2 max-w-[1240px] mx-auto px-6 pt-13 pb-12 flex items-end justify-between gap-7.5 flex-wrap"
+          initial="hidden"
+          animate="show"
+          variants={heroContainer}
+        >
           <div className="flex flex-col gap-3.5 max-w-[44ch]">
-            <p className="m-0 text-[11.5px] tracking-[0.3em] uppercase text-[#BFBFBF]">
+            <motion.p variants={heroItem} className="m-0 text-[11.5px] tracking-[0.3em] uppercase text-[#BFBFBF]">
               <Link href="/" className="text-[#BFBFBF] hover:text-lime transition-colors">
                 Home
               </Link>{" "}
               / Size guide
-            </p>
-            <h1 className="m-0 font-display italic font-black [font-stretch:84%] text-[clamp(32px,5vw,58px)] leading-[0.9] tracking-[-0.02em] uppercase text-white">
+            </motion.p>
+            <motion.h1
+              variants={heroItem}
+              className="m-0 font-display italic font-black [font-stretch:84%] text-[clamp(32px,5vw,58px)] leading-[0.9] tracking-[-0.02em] uppercase text-white"
+            >
               Find
               <br />
               your fit
-            </h1>
-            <span className="block w-[170px] h-3 bg-lime" style={{ clipPath: SWASH_CLIP }} />
-            <p className="m-0 text-[15px] leading-[1.7] text-[#C4C4C4]">
+            </motion.h1>
+            <motion.span variants={heroItem} className="block w-[170px] h-3 bg-lime" style={{ clipPath: SWASH_CLIP }} />
+            <motion.p variants={heroItem} className="m-0 text-[15px] leading-[1.7] text-[#C4C4C4]">
               Our tees run boxy and oversized. If you&apos;re between sizes and want a cleaner fit, take
               the smaller one.
-            </p>
+            </motion.p>
           </div>
           <MarkerNote lines={["Wear", "it", "boxy"]} rotate={-9} swashWidth={110} />
-        </div>
+        </motion.div>
       </section>
 
       <section className="max-w-[1240px] mx-auto px-6 pt-9.5 pb-6.5">
-        <div className="flex items-center justify-between gap-4 flex-wrap mb-5">
+        <Reveal className="flex items-center justify-between gap-4 flex-wrap mb-5">
           <div className="flex gap-2 flex-wrap">
             {(["Tees", "Hoodies", "Shorts"] as Garment[]).map((g) => {
               const active = garment === g;
               return (
-                <button
+                <motion.button
                   key={g}
                   onClick={() => setGarment(g)}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ duration: 0.15 }}
                   className={`font-display font-extrabold text-[11px] tracking-[0.14em] uppercase px-3.75 py-2.5 cursor-pointer border transition-colors ${
                     active ? "border-lime bg-lime text-ground" : "border-white/16 bg-transparent text-[#BDBDBD]"
                   }`}
                 >
                   {g}
-                </button>
+                </motion.button>
               );
             })}
           </div>
@@ -129,21 +153,23 @@ export default function SizeGuidePage() {
             {(["cm", "in"] as Unit[]).map((u) => {
               const active = unit === u;
               return (
-                <button
+                <motion.button
                   key={u}
                   onClick={() => setUnit(u)}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ duration: 0.15 }}
                   className={`font-display font-extrabold text-[11px] tracking-[0.14em] uppercase px-3.75 py-2.5 cursor-pointer border transition-colors ${
                     active ? "border-lime bg-lime text-ground" : "border-white/16 bg-transparent text-[#BDBDBD]"
                   }`}
                 >
                   {u.toUpperCase()}
-                </button>
+                </motion.button>
               );
             })}
           </div>
-        </div>
+        </Reveal>
 
-        <div className="border border-white/10 bg-ground-alt overflow-x-auto">
+        <Reveal delay={0.1} className="border border-white/10 bg-ground-alt overflow-x-auto">
           <div className="min-w-[520px]">
             <div className="grid grid-cols-[90px_repeat(4,minmax(0,1fr))] bg-[#101010] border-b border-white/12">
               <p className="m-0 px-4 py-3.5 font-display font-extrabold text-[11px] tracking-[0.16em] uppercase text-[#8C8C8C]">
@@ -178,27 +204,27 @@ export default function SizeGuidePage() {
               );
             })}
           </div>
-        </div>
+        </Reveal>
         <p className="mt-3.5 mb-0 text-[13px] leading-[1.6] text-[#8C8C8C]">
           Measurements are of the garment laid flat, with a tolerance of ±1.5 cm.{" "}
           {inches ? "Values converted from centimetres." : "Prefer inches? Switch the unit above."}
         </p>
       </section>
 
-      <section className="max-w-[1240px] mx-auto px-6 pt-4.5 pb-14.5 grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-3.5">
+      <StaggerGroup className="max-w-[1240px] mx-auto px-6 pt-4.5 pb-14.5 grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-3.5">
         {HOW_TO.map((h) => (
-          <div key={h.num} className="bg-card border border-white/8 px-5 py-5.5 flex flex-col gap-2.25">
+          <StaggerItem key={h.num} className="bg-card border border-white/8 px-5 py-5.5 flex flex-col gap-2.25">
             <p className="m-0 font-display font-black text-[22px] text-lime">{h.num}</p>
             <p className="m-0 font-display font-extrabold text-xs tracking-[0.14em] uppercase text-white">
               {h.title}
             </p>
             <p className="m-0 text-[13.5px] leading-[1.65] text-[#A8A8A8]">{h.body}</p>
-          </div>
+          </StaggerItem>
         ))}
-      </section>
+      </StaggerGroup>
 
       <section className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] bg-ground border-t border-hairline">
-        <div className="relative min-h-[280px] overflow-hidden">
+        <Reveal className="relative min-h-[280px] overflow-hidden">
           <Image
             src="/assets/team-collection.jpg"
             alt=""
@@ -206,8 +232,8 @@ export default function SizeGuidePage() {
             className="object-cover [object-position:center_46%] [filter:contrast(1.05)_brightness(0.98)]"
           />
           <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(6,6,6,0.62)_0%,rgba(6,6,6,0)_38%,rgba(6,6,6,0.2)_100%)]" />
-        </div>
-        <div className="bg-lime text-ground px-10 py-11.5 flex flex-col justify-center gap-4">
+        </Reveal>
+        <Reveal delay={0.12} className="bg-lime text-ground px-10 py-11.5 flex flex-col justify-center gap-4">
           <h2 className="m-0 font-display italic font-black [font-stretch:85%] text-[clamp(26px,3.2vw,38px)] leading-[0.98] uppercase">
             Still unsure?
           </h2>
@@ -226,7 +252,7 @@ export default function SizeGuidePage() {
               Returns policy
             </Link>
           </div>
-        </div>
+        </Reveal>
       </section>
 
       <Footer />

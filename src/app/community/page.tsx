@@ -3,10 +3,24 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "motion/react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { MarkerNote } from "@/components/MarkerNote";
 import { CtaLink } from "@/components/Button";
+import { Reveal } from "@/components/motion/Reveal";
+import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
+
+const EASE = [0.16, 1, 0.3, 1] as const;
+
+const heroContainer = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.09, delayChildren: 0.08 } },
+};
+const heroItem = {
+  hidden: { opacity: 0, y: 18 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: EASE } },
+};
 
 const SWASH_CLIP =
   "polygon(0% 74%, 4% 40%, 18% 20%, 48% 8%, 78% 4%, 96% 10%, 100% 34%, 97% 62%, 80% 82%, 50% 92%, 22% 98%, 6% 96%)";
@@ -95,38 +109,47 @@ export default function CommunityPage() {
           className="object-cover [object-position:center_44%] [filter:contrast(1.05)_brightness(0.55)]"
         />
         <div className="absolute inset-0 bg-[linear-gradient(96deg,#0A0A0A_0%,rgba(10,10,10,0.9)_32%,rgba(10,10,10,0.48)_66%,rgba(6,6,6,0.78)_100%)]" />
-        <div className="relative z-[2] max-w-[1240px] mx-auto px-6 pt-13 pb-12 flex items-end justify-between gap-7.5 flex-wrap">
+        <motion.div
+          className="relative z-[2] max-w-[1240px] mx-auto px-6 pt-13 pb-12 flex items-end justify-between gap-7.5 flex-wrap"
+          initial="hidden"
+          animate="show"
+          variants={heroContainer}
+        >
           <div className="flex flex-col gap-3.5 max-w-[44ch]">
-            <p className="m-0 text-[11.5px] tracking-[0.3em] uppercase text-[#BFBFBF]">
+            <motion.p variants={heroItem} className="m-0 text-[11.5px] tracking-[0.3em] uppercase text-[#BFBFBF]">
               <Link href="/" className="hover:text-lime transition-colors">
                 Home
               </Link>{" "}
               / Community
-            </p>
-            <h1 className="m-0 font-display italic font-black [font-stretch:84%] text-[clamp(32px,5vw,58px)] leading-[0.9] tracking-[-0.02em] uppercase text-white">
+            </motion.p>
+            <motion.h1
+              variants={heroItem}
+              className="m-0 font-display italic font-black [font-stretch:84%] text-[clamp(32px,5vw,58px)] leading-[0.9] tracking-[-0.02em] uppercase text-white"
+            >
               The squad
-            </h1>
-            <span
+            </motion.h1>
+            <motion.span
+              variants={heroItem}
               className="block w-[170px] h-3 bg-lime"
               style={{ clipPath: SWASH_CLIP }}
             />
-            <p className="m-0 text-[15px] leading-[1.7] text-[#C4C4C4]">
+            <motion.p variants={heroItem} className="m-0 text-[15px] leading-[1.7] text-[#C4C4C4]">
               Weekly sessions, club kit and the people wearing the crest. Open to anyone who shows up.
-            </p>
-            <div className="flex gap-3 flex-wrap mt-1.5">
+            </motion.p>
+            <motion.div variants={heroItem} className="flex gap-3 flex-wrap mt-1.5">
               <CtaLink href="#sessions">Next sessions</CtaLink>
               <CtaLink href="/team-orders" variant="outline">
                 Kit my club
               </CtaLink>
-            </div>
+            </motion.div>
           </div>
           <MarkerNote lines={["Move", "together", "grow", "together"]} rotate={-9} />
-        </div>
+        </motion.div>
       </section>
 
       {/* Weekly sessions */}
       <section id="sessions" className="max-w-[1240px] mx-auto px-6 pt-9.5 pb-4.5">
-        <div className="flex items-end justify-between gap-5 flex-wrap mb-5.5">
+        <Reveal className="flex items-end justify-between gap-5 flex-wrap mb-5.5">
           <div className="flex flex-col gap-3">
             <span className="w-13.5 h-[5px] bg-lime" />
             <h2 className="m-0 font-display italic font-black [font-stretch:85%] text-[clamp(26px,3.2vw,38px)] tracking-[-0.01em] uppercase text-white">
@@ -135,9 +158,11 @@ export default function CommunityPage() {
           </div>
           <div className="flex gap-2 flex-wrap">
             {cities.map((c) => (
-              <button
+              <motion.button
                 key={c}
                 onClick={() => setCity(c)}
+                whileTap={{ scale: 0.95 }}
+                transition={{ duration: 0.15 }}
                 className={`font-display font-extrabold text-[11px] tracking-[0.14em] uppercase px-3.5 py-2.5 cursor-pointer border transition-colors ${
                   city === c
                     ? "border-lime bg-lime text-ground"
@@ -145,13 +170,13 @@ export default function CommunityPage() {
                 }`}
               >
                 {c}
-              </button>
+              </motion.button>
             ))}
           </div>
-        </div>
-        <div className="border border-hairline bg-ground-alt">
+        </Reveal>
+        <StaggerGroup key={city} className="border border-hairline bg-ground-alt">
           {sessions.map((s, i) => (
-            <div
+            <StaggerItem
               key={s.day + s.title}
               className={`grid grid-cols-[110px_minmax(0,1fr)_auto] gap-4.5 items-center px-5.5 py-4.5 ${
                 i < sessions.length - 1 ? "border-b border-hairline" : ""
@@ -170,9 +195,9 @@ export default function CommunityPage() {
               <p className="m-0 text-[12.5px] tracking-[0.1em] uppercase text-lime whitespace-nowrap">
                 {s.level}
               </p>
-            </div>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerGroup>
         <p className="mt-3.5 mb-0 text-[13px] leading-[1.6] text-[#8C8C8C]">
           Sessions are free and open. Bring water, wear whatever you train in — the crest is optional.
         </p>
@@ -180,15 +205,15 @@ export default function CommunityPage() {
 
       {/* Voices */}
       <section className="max-w-[1240px] mx-auto px-6 pt-8.5 pb-5">
-        <div className="flex flex-col gap-3 mb-5.5">
+        <Reveal className="flex flex-col gap-3 mb-5.5">
           <span className="w-13.5 h-[5px] bg-lime" />
           <h2 className="m-0 font-display italic font-black [font-stretch:85%] text-[clamp(26px,3.2vw,38px)] tracking-[-0.01em] uppercase text-white">
             Voices from the squad
           </h2>
-        </div>
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(270px,1fr))] gap-3.5">
+        </Reveal>
+        <StaggerGroup className="grid grid-cols-[repeat(auto-fit,minmax(270px,1fr))] gap-3.5">
           {voices.map((v) => (
-            <article key={v.name} className="bg-card border border-hairline flex flex-col">
+            <StaggerItem key={v.name} className="bg-card border border-hairline flex flex-col">
               <div className="relative aspect-[4/3] overflow-hidden bg-[#121212]">
                 <Image
                   src={v.img}
@@ -212,14 +237,14 @@ export default function CommunityPage() {
                   </div>
                 </div>
               </div>
-            </article>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerGroup>
       </section>
 
       {/* Run with us */}
       <section className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] bg-ground border-t border-hairline/90 mt-8.5">
-        <div className="relative min-h-[320px] overflow-hidden">
+        <Reveal className="relative min-h-[320px] overflow-hidden">
           <Image
             src="/assets/team-back-banner.jpg"
             alt="HUDA Sports team"
@@ -233,8 +258,8 @@ export default function CommunityPage() {
             rotate={-8}
             className="absolute top-9 left-6.5"
           />
-        </div>
-        <div className="bg-lime text-ground px-10 py-12 flex flex-col justify-center gap-4.5">
+        </Reveal>
+        <Reveal delay={0.12} className="bg-lime text-ground px-10 py-12 flex flex-col justify-center gap-4.5">
           <h2 className="m-0 font-display italic font-black [font-stretch:85%] text-[clamp(28px,3.4vw,40px)] leading-[0.98] uppercase">
             Run with us
           </h2>
@@ -250,15 +275,17 @@ export default function CommunityPage() {
               onChange={(e) => setEmail(e.target.value)}
               className="flex-1 min-w-0 bg-ground border border-ground/60 text-white text-[13.5px] px-3 py-3.5 outline-none"
             />
-            <button
+            <motion.button
               onClick={join}
+              whileTap={{ scale: 0.95 }}
+              transition={{ duration: 0.15 }}
               className="bg-ground border-none text-white font-display font-extrabold text-[12px] tracking-[0.12em] uppercase px-4.5 cursor-pointer hover:bg-[#1C1C1C] transition-colors"
             >
               Join
-            </button>
+            </motion.button>
           </div>
           <p className="m-0 text-[13px] font-semibold min-h-[18px]">{note}</p>
-        </div>
+        </Reveal>
       </section>
 
       <Footer />

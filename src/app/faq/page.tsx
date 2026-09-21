@@ -3,9 +3,23 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { AnimatePresence, motion } from "motion/react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { CtaLink } from "@/components/Button";
+import { Reveal } from "@/components/motion/Reveal";
+import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
+
+const EASE = [0.16, 1, 0.3, 1] as const;
+
+const heroContainer = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.09, delayChildren: 0.08 } },
+};
+const heroItem = {
+  hidden: { opacity: 0, y: 18 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: EASE } },
+};
 
 const SWASH_CLIP =
   "polygon(0% 74%, 4% 40%, 18% 20%, 48% 8%, 78% 4%, 96% 10%, 100% 34%, 97% 62%, 80% 82%, 50% 92%, 22% 98%, 6% 96%)";
@@ -126,25 +140,33 @@ export default function FaqPage() {
           className="object-cover [object-position:center_40%] [filter:contrast(1.05)_brightness(0.52)]"
         />
         <div className="absolute inset-0 bg-[linear-gradient(96deg,#0A0A0A_0%,rgba(10,10,10,0.9)_32%,rgba(10,10,10,0.5)_66%,rgba(6,6,6,0.78)_100%)]" />
-        <div className="relative z-[2] max-w-[1240px] mx-auto px-6 pt-13 pb-12 flex items-end justify-between gap-7.5 flex-wrap">
+        <motion.div
+          className="relative z-[2] max-w-[1240px] mx-auto px-6 pt-13 pb-12 flex items-end justify-between gap-7.5 flex-wrap"
+          initial="hidden"
+          animate="show"
+          variants={heroContainer}
+        >
           <div className="flex flex-col gap-3.5 max-w-[44ch]">
-            <p className="m-0 text-[11.5px] tracking-[0.3em] uppercase text-[#BFBFBF]">
+            <motion.p variants={heroItem} className="m-0 text-[11.5px] tracking-[0.3em] uppercase text-[#BFBFBF]">
               <Link href="/" className="hover:text-lime transition-colors">
                 Home
               </Link>{" "}
               / Help
-            </p>
-            <h1 className="m-0 font-display italic font-black [font-stretch:84%] text-[clamp(32px,5vw,58px)] leading-[0.9] tracking-[-0.02em] uppercase text-white">
+            </motion.p>
+            <motion.h1
+              variants={heroItem}
+              className="m-0 font-display italic font-black [font-stretch:84%] text-[clamp(32px,5vw,58px)] leading-[0.9] tracking-[-0.02em] uppercase text-white"
+            >
               Shipping,
               <br />
               returns &amp; FAQ
-            </h1>
-            <span className="block w-[170px] h-3 bg-lime" style={{ clipPath: SWASH_CLIP }} />
-            <p className="m-0 text-[15px] leading-[1.7] text-[#C4C4C4]">
+            </motion.h1>
+            <motion.span variants={heroItem} className="block w-[170px] h-3 bg-lime" style={{ clipPath: SWASH_CLIP }} />
+            <motion.p variants={heroItem} className="m-0 text-[15px] leading-[1.7] text-[#C4C4C4]">
               Everything about delivery, exchanges and team orders in one place.
-            </p>
+            </motion.p>
           </div>
-          <div className="flex flex-col gap-2.5 min-w-[260px] flex-[0_1_340px]">
+          <motion.div variants={heroItem} className="flex flex-col gap-2.5 min-w-[260px] flex-[0_1_340px]">
             <input
               type="text"
               placeholder="Search a question"
@@ -156,34 +178,36 @@ export default function FaqPage() {
               className="bg-ground/80 border border-white/22 text-white text-[14px] px-3.5 py-4 outline-none focus:border-lime"
             />
             <p className="m-0 text-[12.5px] tracking-[0.1em] uppercase text-[#8C8C8C]">{resultNote}</p>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* Highlights */}
-      <section className="max-w-[1240px] mx-auto px-6 pt-8.5 pb-5 grid grid-cols-[repeat(auto-fit,minmax(230px,1fr))] gap-3.5">
+      <StaggerGroup className="max-w-[1240px] mx-auto px-6 pt-8.5 pb-5 grid grid-cols-[repeat(auto-fit,minmax(230px,1fr))] gap-3.5">
         {highlights.map((h) => (
-          <div key={h.title} className="bg-card border border-hairline px-5 py-5.5 flex flex-col gap-2">
+          <StaggerItem key={h.title} className="bg-card border border-hairline px-5 py-5.5 flex flex-col gap-2">
             <p className="m-0 font-display font-black text-[20px] text-lime">{h.value}</p>
             <p className="m-0 font-display font-extrabold text-[11.5px] tracking-[0.14em] uppercase text-white">
               {h.title}
             </p>
             <p className="m-0 text-[13.5px] leading-[1.65] text-[#A8A8A8]">{h.body}</p>
-          </div>
+          </StaggerItem>
         ))}
-      </section>
+      </StaggerGroup>
 
       {/* Content */}
       <section className="max-w-[1240px] mx-auto px-6 pt-3.5 pb-15 grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-8.5 items-start">
-        <div className="flex flex-col gap-5.5">
+        <Reveal className="flex flex-col gap-5.5">
           <div className="flex gap-2 flex-wrap">
             {categories.map((c) => (
-              <button
+              <motion.button
                 key={c}
                 onClick={() => {
                   setCategory(c);
                   setOpen(0);
                 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ duration: 0.15 }}
                 className={`font-display font-extrabold text-[11px] tracking-[0.14em] uppercase px-3.5 py-2.5 cursor-pointer border transition-colors ${
                   category === c
                     ? "border-lime bg-lime text-ground"
@@ -191,7 +215,7 @@ export default function FaqPage() {
                 }`}
               >
                 {c}
-              </button>
+              </motion.button>
             ))}
           </div>
 
@@ -209,11 +233,21 @@ export default function FaqPage() {
                     </span>
                     <span className="text-[17px] text-lime">{isOpen ? "−" : "+"}</span>
                   </button>
-                  {isOpen && (
-                    <p className="m-0 pb-5 px-0.5 text-[14px] leading-[1.75] text-[#B0B0B0] max-w-[60ch]">
-                      {f.answer}
-                    </p>
-                  )}
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: EASE }}
+                        className="overflow-hidden"
+                      >
+                        <p className="m-0 pb-5 px-0.5 text-[14px] leading-[1.75] text-[#B0B0B0] max-w-[60ch]">
+                          {f.answer}
+                        </p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               );
             })}
@@ -230,10 +264,10 @@ export default function FaqPage() {
               <CtaLink href="/contact">Contact us</CtaLink>
             </div>
           )}
-        </div>
+        </Reveal>
 
         <div className="flex flex-col gap-3.5">
-          <div className="bg-ground-alt border border-hairline p-5.5 flex flex-col gap-3">
+          <Reveal className="bg-ground-alt border border-hairline p-5.5 flex flex-col gap-3">
             <p className="m-0 font-display font-extrabold text-[12px] tracking-[0.16em] uppercase text-white">
               Delivery &amp; pricing
             </p>
@@ -256,9 +290,9 @@ export default function FaqPage() {
             <p className="mt-0.5 mb-0 text-[13px] leading-[1.6] text-[#8C8C8C]">
               Free standard shipping on orders over $80.
             </p>
-          </div>
+          </Reveal>
 
-          <div className="bg-ground-alt border border-hairline p-5.5 flex flex-col gap-2.5">
+          <Reveal delay={0.1} className="bg-ground-alt border border-hairline p-5.5 flex flex-col gap-2.5">
             <p className="m-0 font-display font-extrabold text-[12px] tracking-[0.16em] uppercase text-white">
               Useful links
             </p>
@@ -274,9 +308,9 @@ export default function FaqPage() {
             <Link href="/legal" className="text-[13.5px] text-lime hover:text-lime-hover transition-colors">
               Privacy &amp; terms →
             </Link>
-          </div>
+          </Reveal>
 
-          <div className="bg-lime text-ground px-5.5 py-6 flex flex-col gap-3">
+          <Reveal delay={0.2} className="bg-lime text-ground px-5.5 py-6 flex flex-col gap-3">
             <h2 className="m-0 font-display italic font-black text-[22px] leading-none uppercase">
               Question not here?
             </h2>
@@ -286,7 +320,7 @@ export default function FaqPage() {
             <CtaLink href="/contact" variant="dark" className="self-start mt-1">
               Contact us
             </CtaLink>
-          </div>
+          </Reveal>
         </div>
       </section>
 

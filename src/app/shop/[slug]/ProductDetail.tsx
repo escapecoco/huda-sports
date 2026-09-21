@@ -3,13 +3,18 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { AnimatePresence, motion } from "motion/react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { MarkerNote } from "@/components/MarkerNote";
 import { CtaLink } from "@/components/Button";
 import { ProductCard } from "@/components/ProductCard";
+import { Reveal } from "@/components/motion/Reveal";
+import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 import { useCart } from "@/lib/cart-context";
 import { getRelated, type Product } from "@/lib/products";
+
+const EASE = [0.16, 1, 0.3, 1] as const;
 
 const shippingCopy =
   "Free standard shipping over $80. Dispatched within 48 hours, 2-4 working days in metro areas. Unworn items can be returned within 30 days.";
@@ -73,7 +78,12 @@ export function ProductDetail({ product }: { product: Product }) {
 
       <section className="max-w-[1240px] mx-auto px-6 pt-3.5 pb-15 grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-10 items-start">
         {/* Gallery */}
-        <div className="flex flex-col gap-3">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: EASE }}
+          className="flex flex-col gap-3"
+        >
           <div className="relative aspect-4/5 bg-[#121212] border border-hairline overflow-hidden">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,#232323_0%,#141414_68%,#0B0B0B_100%)]" />
             <div
@@ -89,10 +99,11 @@ export function ProductDetail({ product }: { product: Product }) {
           </div>
           <div className="grid grid-cols-4 gap-3">
             {product.gallery.map((g, i) => (
-              <button
+              <motion.button
                 key={i}
                 onClick={() => setPhotoIndex(i)}
                 aria-label={`Show photo ${i + 1}`}
+                whileTap={{ scale: 0.92 }}
                 className={`aspect-square p-0 cursor-pointer bg-cover border transition-[filter,border-color] ${
                   photoIndex === i ? "border-lime brightness-[1.04]" : "border-white/12 brightness-[0.72]"
                 }`}
@@ -100,10 +111,15 @@ export function ProductDetail({ product }: { product: Product }) {
               />
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* Info */}
-        <div className="flex flex-col gap-5 pt-1">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.08, ease: EASE }}
+          className="flex flex-col gap-5 pt-1"
+        >
           <div className="flex flex-col gap-3">
             <span className="w-13.5 h-[5px] bg-lime" />
             <h1 className="m-0 font-display italic font-black [font-stretch:84%] text-[clamp(30px,4vw,46px)] leading-[0.96] tracking-[-0.01em] uppercase text-white">
@@ -126,10 +142,11 @@ export function ProductDetail({ product }: { product: Product }) {
             </p>
             <div className="flex gap-2.5 flex-wrap">
               {product.colors.map((c, i) => (
-                <button
+                <motion.button
                   key={c.name}
                   onClick={() => setColorIndex(i)}
                   aria-label={c.name}
+                  whileTap={{ scale: 0.92 }}
                   className="w-8.5 h-8.5 rounded-full cursor-pointer"
                   style={{
                     background: c.hex,
@@ -152,12 +169,13 @@ export function ProductDetail({ product }: { product: Product }) {
             </div>
             <div className="flex gap-2 flex-wrap">
               {product.sizes.map((sz) => (
-                <button
+                <motion.button
                   key={sz}
                   onClick={() => {
                     setSize(sz);
                     setSizeNote("");
                   }}
+                  whileTap={{ scale: 0.92 }}
                   className={`min-w-13 px-2.5 py-3.25 cursor-pointer font-display font-extrabold text-xs tracking-[0.08em] border transition-colors ${
                     size === sz
                       ? "border-lime bg-lime text-ground"
@@ -165,7 +183,7 @@ export function ProductDetail({ product }: { product: Product }) {
                   }`}
                 >
                   {sz}
-                </button>
+                </motion.button>
               ))}
             </div>
             <p className="mt-0.5 mb-0 text-[12.5px] text-lime min-h-4.25">{sizeNote}</p>
@@ -213,21 +231,31 @@ export function ProductDetail({ product }: { product: Product }) {
                   >
                     {row.title} <span className="text-base text-lime">{open ? "−" : "+"}</span>
                   </button>
-                  {open && (
-                    <p className="m-0 px-0.5 pb-4.5 text-sm leading-[1.7] text-[#B0B0B0] max-w-[52ch]">
-                      {row.body}
-                    </p>
-                  )}
+                  <AnimatePresence initial={false}>
+                    {open && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: EASE }}
+                        className="overflow-hidden"
+                      >
+                        <p className="m-0 px-0.5 pb-4.5 text-sm leading-[1.7] text-[#B0B0B0] max-w-[52ch]">
+                          {row.body}
+                        </p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               );
             })}
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* Print it for your team */}
       <section className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] bg-ground border-t border-hairline/90">
-        <div className="relative min-h-[300px] overflow-hidden">
+        <Reveal className="relative min-h-[300px] overflow-hidden">
           <Image
             src="/assets/team-back-banner.jpg"
             alt="Team wearing HUDA prints"
@@ -242,8 +270,8 @@ export function ProductDetail({ product }: { product: Product }) {
             align="left"
             swashWidth={120}
           />
-        </div>
-        <div className="bg-lime text-ground px-10 py-12 flex flex-col justify-center gap-4.5">
+        </Reveal>
+        <Reveal delay={0.12} className="bg-lime text-ground px-10 py-12 flex flex-col justify-center gap-4.5">
           <h2 className="m-0 font-display italic font-black [font-stretch:85%] text-[clamp(26px,3.2vw,38px)] leading-[0.98] uppercase">
             Print it
             <br />
@@ -255,14 +283,14 @@ export function ProductDetail({ product }: { product: Product }) {
           <CtaLink href="/team-orders" variant="dark" className="self-start mt-2">
             Request a quote
           </CtaLink>
-        </div>
+        </Reveal>
       </section>
 
       {/* Complete the fit */}
       {related.length > 0 && (
         <section className="px-6 pt-13.5 pb-15.5 bg-ground border-t border-hairline/90">
           <div className="max-w-[1240px] mx-auto">
-            <div className="flex items-end justify-between gap-5 mb-6.5 flex-wrap">
+            <Reveal className="flex items-end justify-between gap-5 mb-6.5 flex-wrap">
               <h2 className="m-0 font-display italic font-black [font-stretch:85%] text-[clamp(26px,3.2vw,38px)] tracking-[-0.01em] uppercase text-white">
                 Complete the fit
               </h2>
@@ -272,12 +300,14 @@ export function ProductDetail({ product }: { product: Product }) {
               >
                 Shop all &rarr;
               </Link>
-            </div>
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(230px,1fr))] gap-3.5">
+            </Reveal>
+            <StaggerGroup className="grid grid-cols-[repeat(auto-fit,minmax(230px,1fr))] gap-3.5">
               {related.map((p) => (
-                <ProductCard key={p.slug} product={p} aspect="portrait" />
+                <StaggerItem key={p.slug}>
+                  <ProductCard product={p} aspect="portrait" />
+                </StaggerItem>
               ))}
-            </div>
+            </StaggerGroup>
           </div>
         </section>
       )}
