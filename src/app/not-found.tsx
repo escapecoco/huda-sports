@@ -114,7 +114,7 @@ export default function NotFound() {
           </StaggerGroup>
         </motion.div>
 
-        <div className="flex-[1.15_1_420px] relative min-h-[400px]">
+        <div className="flex-[1.15_1_420px] relative min-h-[400px] overflow-hidden">
           <motion.div
             className="absolute inset-0 overflow-hidden"
             style={{ clipPath: "polygon(11% 0%, 100% 0%, 100% 100%, 0% 100%)" }}

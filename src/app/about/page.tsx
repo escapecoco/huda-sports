@@ -125,7 +125,7 @@ export default function AboutPage() {
           </motion.div>
         </motion.div>
 
-        <div className="flex-[1.4_1_460px] relative min-h-[440px]">
+        <div className="flex-[1.4_1_460px] relative min-h-[440px] overflow-hidden">
           <motion.div
             className="absolute inset-0 overflow-hidden"
             style={{ clipPath: "polygon(11% 0%, 100% 0%, 100% 100%, 0% 100%)" }}

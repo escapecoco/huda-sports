@@ -19,6 +19,10 @@
 }
 
 @layer base {
+  html {
+    overflow-x: hidden;
+  }
+
   body {
     background: var(--color-ground);
     color: var(--color-ink);

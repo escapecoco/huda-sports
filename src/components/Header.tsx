@@ -42,7 +42,7 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 flex-wrap justify-end">
           <Link
             href="/search"
             className="font-display font-extrabold text-[11.5px] tracking-[0.14em] uppercase text-white hover:text-lime transition-colors"

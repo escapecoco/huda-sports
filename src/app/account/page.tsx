@@ -237,7 +237,7 @@ export default function AccountPage() {
             </motion.div>
           </motion.div>
 
-          <div className="flex-[1.15_1_400px] relative min-h-[380px]">
+          <div className="flex-[1.15_1_400px] relative min-h-[380px] overflow-hidden">
             <motion.div
               className="absolute inset-0 overflow-hidden"
               style={{ clipPath: "polygon(11% 0%, 100% 0%, 100% 100%, 0% 100%)" }}

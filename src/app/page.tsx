@@ -103,7 +103,7 @@ export default function Home() {
           </motion.div>
         </motion.div>
 
-        <div className="flex-[1.45_1_460px] relative min-h-[430px] bg-ground-alt">
+        <div className="flex-[1.45_1_460px] relative min-h-[430px] bg-ground-alt overflow-hidden">
           <motion.div
             className="absolute inset-0 overflow-hidden"
             style={{ clipPath: "polygon(11% 0%, 100% 0%, 100% 100%, 0% 100%)" }}
